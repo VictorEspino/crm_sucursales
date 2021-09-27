@@ -43,6 +43,7 @@ Route::get('/orden_nuevo', function () {return view('orden_nuevo');})->middlewar
 Route::post('/orden_nuevo', [ProcesaFormasController::class,'orden_nuevo'])->middleware('auth')->name('orden_nuevo');
 
 Route::get('/seguimiento_funnel', [ProcesaSeguimientoController::class,'seguimiento_funnel'])->middleware('auth')->name('seguimiento_funnel');
+Route::get('/seguimiento_funnel_calendario', [ProcesaSeguimientoController::class,'seguimiento_funnel_calendario'])->middleware('auth')->name('seguimiento_funnel_calendario');
 Route::get('/seguimiento_orden', [ProcesaSeguimientoController::class,'seguimiento_orden'])->middleware('auth')->name('seguimiento_orden');
 
 Route::get('/funnel_detalles/{id}', [ProcesaFormasController::class,'funnel_detalles'])->middleware('auth')->name('funnel_detalles');

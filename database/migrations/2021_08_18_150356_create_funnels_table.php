@@ -32,6 +32,7 @@ class CreateFunnelsTable extends Migration
             $table->date('estatus2');
             $table->date('estatus3');
             $table->string('observaciones');
+            $table->date('fecha_sig_contacto');
             $table->integer('minutos');
             $table->timestamps();
         });

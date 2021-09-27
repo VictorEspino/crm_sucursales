@@ -113,6 +113,7 @@ class ProcesaFormasController extends Controller
                 'funnel_equipo' => 'required',
                 'funnel_estatus' => 'required',
                 'observaciones_f' => 'max:255',
+                'fecha_sig_contacto' => 'required|date_format:Y-m-d'
             ]);
             $funnel=new Funnel;      
             $funnel->empleado=Auth::user()->empleado;
@@ -129,6 +130,7 @@ class ProcesaFormasController extends Controller
             $funnel->equipo=$request->funnel_equipo;
             $funnel->estatus=$request->funnel_estatus;
             $funnel->observaciones=$request->observaciones_f;
+            $funnel->fecha_sig_contacto=$request->fecha_sig_contacto;
             $funnel->minutos=10;
             $funnel->save();
             $adicional=" incluido el registro de prospecto ";
@@ -235,6 +237,7 @@ class ProcesaFormasController extends Controller
             'funnel_equipo' => 'required',
             'funnel_estatus' => 'required',
             'observaciones' => 'max:255',
+            'fecha_sig_contacto' => 'required|date_format:Y-m-d'
         ]);
         $funnel=new Funnel;      
         $funnel->empleado=Auth::user()->empleado;
@@ -251,6 +254,7 @@ class ProcesaFormasController extends Controller
         $funnel->equipo=$request->funnel_equipo;
         $funnel->estatus=$request->funnel_estatus;
         $funnel->observaciones=$request->observaciones;
+        $funnel->fecha_sig_contacto=$request->fecha_sig_contacto;
         $funnel->minutos=10;
         $funnel->save();
         return(view('mensaje',[ 'estatus'=>'OK',
@@ -359,6 +363,7 @@ class ProcesaFormasController extends Controller
         $funnel->estatus1=$request->estatus1;
         $funnel->estatus2=$request->estatus2;
         $funnel->estatus3=$request->estatus3;
+        $funnel->fecha_sig_contacto=$request->fecha_sig_contacto;
         $funnel->estatus=$request->estatus;
         $funnel->observaciones=$request->observaciones;
         $funnel->cliente=$request->cliente;

@@ -98,6 +98,10 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
         chart.draw(data, options);
         }
     </script>
+
+        <link href='{{asset('js/calendario/main.css')}}' rel='stylesheet' />
+        <script src='{{asset('js/calendario/main.js')}}'></script>
+        <script src='{{asset('js/calendario/es.js')}}'></script>
     
     </head>
     
@@ -199,6 +203,14 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
                                     <i class="fas fa-table float-left mx-2"></i>
                                       Seguimiento Funnel
+                                    <span><i class="fa fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('seguimiento_funnel_calendario')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('seguimiento_funnel_calendario') }}"
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-table float-left mx-2"></i>
+                                      Calendario Funnel
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
                             </li>

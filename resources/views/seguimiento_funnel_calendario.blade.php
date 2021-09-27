@@ -12,51 +12,9 @@
         
         <div class="w-full rounded-b-lg bg-white p-3 flex flex-col"> <!--CONTENIDO-->
             <div class="w-full">
-                <form action="{{route('seguimiento_funnel')}}" class="">
-                    <input class="w-1/3 rounded p-1 border border-gray-300" type="text" name="query" value="{{$query}}" placeholder="Buscar prospecto"> 
-                    <button class="rounded p-1 border bg-green-500 hover:bg-green-700 text-gray-100 font-semibold">Buscar</button>
-                </form>
+                <div id='calendar'></div>
             </div>
-            <div class="flex justify-end text-xs">
-                {{$registros->links()}}
-            </div>
-            <div class="w-full flex justify-center pt-5 flex-col"> <!--TABLA DE CONTENIDO-->
-                <div class="w-full flex justify-center pb-3"><span class="font-semibold text-sm text-gray-700">Registros Funnel</span></div>
-                <div class="w-full flex justify-center">
-                <table>
-                    <tr class="">
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"></td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Ejecutivo</td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Origen</td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Cliente</td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Plan</td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Equipo</td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Estatus</td>
-                        <td class="border border-gray-300 font-semibold bg-blue-500 text-gray-200 p-1 text-sm"><center>Creacion</td>
-                    </tr>
-                <?php
-                    $color=false;
-                    foreach($registros as $funnel)
-                    {
-                ?>
-                    <tr class="">
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs"><center><a href="javascript:detalles({{$funnel->id}})"><i class="far fa-edit"></i></a></td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->nombre}}</td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->origen}}</td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->cliente}}</td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->plan}}</td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->equipo}}</td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->estatus}}</td>
-                        <td class="border border-gray-300 font-light {{$color?'bg-gray-100':''}} text-gray-700 p-1 text-xs">{{$funnel->created_at}}</td>
-                    </tr>
-                <?php
-                    $color=!$color;
-                    }
-                ?>
-                </table>
-                </div>
-            </div><!--FIN DE TABLA -->
-
+            
         </div> <!-- FIN DEL CONTENIDO -->
     </div> <!--DIV PRINCIPAL-->
 
@@ -268,4 +226,33 @@
                 xmlhttp.send(parametros);
             }
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              var calendarEl = document.getElementById('calendar');
+          
+              var calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                initialDate: '{{$inicio}}',
+                navLinks: true, // can click day/week names to navigate views
+                selectable: false,
+                selectMirror: false,
+                
+                eventClick: function(arg) {
+                  detalles(arg.event.id);
+                },
+                editable: true,
+                dayMaxEvents: true, // allow "more" link when too many events
+                events: {!!$registros!!},
+                locale: 'es',
+                slotDuration: '24:00'
+              });
+          
+              calendar.render();
+            });
+          
+          </script>
 </x-app-layout>
