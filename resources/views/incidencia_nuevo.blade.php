@@ -17,7 +17,7 @@
             <div class="w-full flex flex-row space-x-2">
                 <div class="w-1/3">
                     <span class="text-xs">Dia de Incidencia</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="dia_incidencia" value="{{old('dia_incidencia')}}" placeholder="YYYY-MM-DD">
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="dia_incidencia" value="{{old('dia_incidencia')}}" placeholder="YYYY-MM-DD">
                     
                     @error('dia_incidencia')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>

@@ -228,6 +228,26 @@ var myChart = new Chart(ctx, {
             borderWidth: 1
             },
             {
+                label: 'Otras actividades',
+                data: [
+                    <?php
+                    foreach($tiempos as $tiempo)
+            {
+            ?>
+                '{{$tiempo->otras}}',
+            <?php
+            }
+            ?>                      
+                    ],
+                backgroundColor: [
+                    'rgba(224, 188, 88, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(224, 188, 88, 1)',
+                ],
+            borderWidth: 1
+            },
+            {
                 label: 'Objetivo Diario',
                 data: [
             <?php

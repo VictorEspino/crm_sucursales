@@ -183,6 +183,14 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                                 Actividad
                             </li>
                             <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('interaccion_nuevo')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('actividad_extra_nuevo') }}"
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-chart-line float-left mx-2"></i>
+                                      Actividades
+                                    <span><i class="fa fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('interaccion_nuevo')?'bg-gray-100':'br-gray-800'}}">
                                 <a href="{{ route('interaccion_nuevo') }}"
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
                                     <i class="fas fa-handshake float-left mx-2"></i>
@@ -209,7 +217,8 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                             <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('seguimiento_funnel_calendario')?'bg-gray-100':'br-gray-800'}}">
                                 <a href="{{ route('seguimiento_funnel_calendario') }}"
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
-                                    <i class="fas fa-table float-left mx-2"></i>
+                                    <i class="far fa-calendar-alt float-left mx-2"></i>
+                                    
                                       Calendario Funnel
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
@@ -243,6 +252,14 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
                                     <i class="fas fa-indent float-left mx-2"></i>
                                       Registro de Incidencia
+                                    <span><i class="fa fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('seguimiento_incidencias')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('seguimiento_incidencias') }}"
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-table float-left mx-2"></i>
+                                      Revisar Incidencias
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
                             </li>

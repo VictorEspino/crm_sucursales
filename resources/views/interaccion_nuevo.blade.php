@@ -156,7 +156,7 @@
                 </div>
                 <div class="w-1/2">
                     <span class="text-xs">Fecha Siguiente Contacto</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="fecha_sig_contacto" value="{{old('fecha_sig_contacto')}}" placeholder='YYYY-MM-DD'>
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="fecha_sig_contacto" value="{{old('fecha_sig_contacto')}}" placeholder='YYYY-MM-DD'>
                     @error('fecha_sig_contacto')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
@@ -234,7 +234,7 @@
                 </div>
                 <div class="w-1/3">
                     <span class="text-xs">Fecha Nacimiento</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="f_nacimiento" value="{{old('f_nacimiento')}}" placeholder="YYYY-MM-DD">
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="f_nacimiento" value="{{old('f_nacimiento')}}" placeholder="YYYY-MM-DD">
                     @error('f_nacimiento')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
@@ -348,7 +348,7 @@
                     <span class="text-xs">Generada en</span><br>
                     <select class="w-full rounded p-1 border border-gray-300" type="text" name="generada_en">
                         <option value="Tienda" class="" {{old('generada_en')=="Tienda"?'selected':''}}>Tienda</option>
-                        <option value="Virtual MAQ" class="" {{old('generada_en')=="Virtual MAQ"?'selected':''}}>Virtual MAW</option>
+                        <option value="Virtual MAQ" class="" {{old('generada_en')=="Virtual MAQ"?'selected':''}}>Virtual MAQ</option>
                     </select>    
                     @error('generada_en')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>

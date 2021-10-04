@@ -45,6 +45,7 @@ Route::post('/orden_nuevo', [ProcesaFormasController::class,'orden_nuevo'])->mid
 Route::get('/seguimiento_funnel', [ProcesaSeguimientoController::class,'seguimiento_funnel'])->middleware('auth')->name('seguimiento_funnel');
 Route::get('/seguimiento_funnel_calendario', [ProcesaSeguimientoController::class,'seguimiento_funnel_calendario'])->middleware('auth')->name('seguimiento_funnel_calendario');
 Route::get('/seguimiento_orden', [ProcesaSeguimientoController::class,'seguimiento_orden'])->middleware('auth')->name('seguimiento_orden');
+Route::get('/seguimiento_incidencias', [ProcesaSeguimientoController::class,'seguimiento_incidencias'])->middleware('auth')->name('seguimiento_incidencias');
 
 Route::get('/funnel_detalles/{id}', [ProcesaFormasController::class,'funnel_detalles'])->middleware('auth')->name('funnel_detalles');
 
@@ -74,6 +75,10 @@ Route::get('/export_orden/{periodo}', [ExportController::class,'export_orden'])-
 
 Route::get('/incidencia_nuevo', function () {return view('incidencia_nuevo');})->middleware('auth')->name('incidencia_nuevo');
 Route::post('/incidencia_nuevo', [ProcesaFormasController::class,'incidencia_nuevo'])->middleware('auth')->name('incidencia_nuevo');
+Route::post('/incidencia_borrar', [ProcesaFormasController::class,'incidencia_borrar'])->middleware('auth');
+
+Route::get('/actividad_extra_nuevo', function () {return view('actividad_extra_nuevo');})->middleware('auth')->name('actividad_extra_nuevo');
+Route::post('/actividad_extra_nuevo', [ProcesaFormasController::class,'actividad_extra_nuevo'])->middleware('auth')->name('actividad_extra_nuevo');
 
 Route::get('/objetivo_update', function () {return view('modificar_objetivo');})->middleware('auth')->name('objetivo_update');
 Route::post('/objetivo_update', [ProcesaFormasController::class,'objetivo_update'])->middleware('auth')->name('objetivo_update');

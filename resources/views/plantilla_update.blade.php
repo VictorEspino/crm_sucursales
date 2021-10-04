@@ -29,7 +29,7 @@
                 </div>
                 <div class="w-1/4">
                     <span class="text-xs">Fecha Ingreso</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="f_ingreso" value="{{old('f_ingreso')}}" placeholder="YYYY-MM-DD" id="f_ingreso">
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="f_ingreso" value="{{old('f_ingreso')}}" placeholder="YYYY-MM-DD" id="f_ingreso">
                     @error('f_ingreso')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    

@@ -13,6 +13,8 @@ use App\Models\CatalogoInteracciones;
 use App\Models\GeneracionDemanda;
 use App\Models\ParametrosTiempo;
 use App\Models\Incidencia;
+use App\Models\TimeUpdate;
+use App\Models\ActividadesExtra;
 
 use Illuminate\Http\Request;
 
@@ -359,7 +361,26 @@ class ProcesaFormasController extends Controller
     }
     public function funnel_update(Request $request)
     {
+        $cambio=false;
+
         $funnel=Funnel::find($request->id);
+
+        $e1_a=$funnel->estatus1;
+        $e2_a=$funnel->estatus2;
+        $e3_a=$funnel->estatus3;
+        $fs_a=$funnel->fecha_sig_contacto;
+        $e_a=$funnel->estatus;
+        $o_a=$funnel->observaciones;
+
+        if($e1_a!=$request->estatus1 || $e2_a!=$request->estatus2 || 
+            $e3_a!=$request->estatus3 || $fs_a!=$request->fecha_sig_contacto ||
+            $e_a!=$request->estatus || $o_a!=$request->observaciones)
+            {
+                $cambio=true;
+            }
+
+
+
         $funnel->estatus1=$request->estatus1;
         $funnel->estatus2=$request->estatus2;
         $funnel->estatus3=$request->estatus3;
@@ -372,8 +393,22 @@ class ProcesaFormasController extends Controller
         $funnel->producto=$request->producto;
         $funnel->plan=$request->plan;
         $funnel->equipo=$request->equipo;
-        $funnel->minutos=$funnel->minutos+10;
         $funnel->save();
+
+        if($cambio)
+        {
+        $tiempos=new TimeUpdate();
+        $tiempos->empleado=Auth::user()->empleado;
+        $tiempos->nombre=Auth::user()->name;
+        $tiempos->udn=Auth::user()->udn;
+        $tiempos->pdv=Auth::user()->pdv;
+        $tiempos->region=Auth::user()->region;
+        $tiempos->minutos_funnel=10;
+        $tiempos->funnel_id=$request->id;
+        $tiempos->save();
+        }
+
+
         return;
     }
     public function orden_detalles(Request $request)
@@ -383,7 +418,7 @@ class ProcesaFormasController extends Controller
     public function orden_update(Request $request)
     {
         $orden=Ordenes::find($request->id);
-        //return($request->cliente);
+        $e_anterior=$orden->estatus_final;
         $orden->estatus_final=$request->estatus_final;
         $orden->observaciones=$request->observaciones;
         $orden->cliente=$request->cliente;
@@ -392,17 +427,39 @@ class ProcesaFormasController extends Controller
         $orden->plan=$request->plan;
         $orden->equipo=$request->equipo;
         $orden->renta=$request->renta;
-        $minutos=20; //default value
-        $tiempos=ParametrosTiempo::where('fuente','ORDENES')
-                                ->where('tipo',$request->estatus_final)
-                                ->get();
-        
-        foreach($tiempos as $tiempo)
-        {
-            $minutos=$tiempo->minutos;
-        }
-        $orden->minutos=$minutos;
         $orden->save();
+        $minutos=0;
+        if($e_anterior!=$request->estatus_final)
+        {
+            $tiempos_nuevo=ParametrosTiempo::where('fuente','ORDENES')
+                                    ->where('tipo',$request->estatus_final)
+                                    ->get();
+            $tiempos_anterior=ParametrosTiempo::where('fuente','ORDENES')
+                                    ->where('tipo',$e_anterior)
+                                    ->get();
+
+            foreach($tiempos_nuevo as $tiempo)
+            {
+                $minutos_nuevo=$tiempo->minutos;
+            }
+
+            foreach($tiempos_anterior as $tiempo)
+            {
+                $minutos_anterior=$tiempo->minutos;
+            }
+            
+            //return($minutos_nuevo.'-'.$minutos_anterior);
+        
+            $tiempos=new TimeUpdate;
+            $tiempos->empleado=Auth::user()->empleado;
+            $tiempos->nombre=Auth::user()->name;
+            $tiempos->udn=Auth::user()->udn;
+            $tiempos->pdv=Auth::user()->pdv;
+            $tiempos->region=Auth::user()->region;
+            $tiempos->minutos_orden=intval($minutos_nuevo)-intval($minutos_anterior);
+            $tiempos->orden_id=$request->id;
+            $tiempos->save();
+        }
         return;
     }
     public function demanda_nuevo(Request $request)
@@ -412,7 +469,8 @@ class ProcesaFormasController extends Controller
             'sms' => 'required|numeric',
             'sms_individual' => 'required|numeric',
             'llamadas' => 'required|numeric',
-            'rs' => 'required|numeric',            
+            'rs' => 'required|numeric',  
+            'minutos_base'=> 'numeric|min:0'          
         ]);
         $registro=new GeneracionDemanda;      
         $registro->empleado=Auth::user()->empleado;
@@ -452,7 +510,8 @@ class ProcesaFormasController extends Controller
                 $minutos=$minutos+$request->sms_individual*$tiempo->minutos;
             }   
         }
-        $registro->minutos=$minutos;
+        $registro->minutos_base=$request->minutos_base;
+        $registro->minutos=$minutos+$request->minutos_base;
         $registro->save();
         
         return(view('mensaje',[ 'estatus'=>'OK',
@@ -493,6 +552,11 @@ class ProcesaFormasController extends Controller
         return(view('mensaje',[ 'estatus'=>'OK',
                                 'mensaje'=>'El registro de la incidencia ('.$request->dia_incidencia.' - '.$request->tipo.') se realizo de manera exitosa!'
                               ]));
+    }
+    public function incidencia_borrar(Request $request)
+    {
+        Incidencia::find($request->id)->delete();
+        return;
     }
     public function objetivo_consulta(Request $request) 
     {
@@ -542,6 +606,29 @@ class ProcesaFormasController extends Controller
         }
         return(view('mensaje',[ 'estatus'=>'OK',
                                 'mensaje'=>'La actualizacion de objetivos ('.$request->periodo.') se realizo de manera exitosa!'
+                              ]));
+    }
+    public function actividad_extra_nuevo(Request $request)
+    {
+        $request->validate([
+            'dia_trabajo' => 'required|date_format:Y-m-d',
+            'tipo' => 'required',
+            'minutos' => 'required|numeric|min:0'
+        
+        ]);
+        $registro=new ActividadesExtra;      
+        $registro->empleado=Auth::user()->empleado;
+        $registro->nombre=Auth::user()->name;
+        $registro->udn=Auth::user()->udn;
+        $registro->pdv=Auth::user()->pdv;
+        $registro->region=Auth::user()->region;
+        $registro->tipo=$request->tipo;
+        $registro->dia_trabajo=$request->dia_trabajo;
+        $registro->minutos=$request->minutos;
+        $registro->save();
+        
+        return(view('mensaje',[ 'estatus'=>'OK',
+                                'mensaje'=>'El registro de la actividad ('.$request->dia_trabajo.' - '.$request->tipo.') se realizo de manera exitosa!'
                               ]));
     }
 }

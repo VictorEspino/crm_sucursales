@@ -92,7 +92,7 @@
                 </div>
                 <div class="w-1/2">
                     <span class="text-xs">Fecha Siguiente Contacto</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="fecha_sig_contacto" value="{{old('fecha_sig_contacto')}}" placeholder='YYYY-MM-DD'>
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="fecha_sig_contacto" value="{{old('fecha_sig_contacto')}}" placeholder='YYYY-MM-DD' >
                     @error('fecha_sig_contacto')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    

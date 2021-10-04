@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Funnel;
 use App\Models\Ordenes;
+use App\Models\Incidencia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -17,8 +18,8 @@ class ProcesaSeguimientoController extends Controller
     
         if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
         {
-            $campo_universo='empleado';
-            $key_universo=Auth::user()->empleado;
+            $campo_universo='udn';
+            $key_universo=Auth::user()->udn;
         }
         if(Auth::user()->puesto=='Gerente')
         {
@@ -58,8 +59,8 @@ class ProcesaSeguimientoController extends Controller
     
         if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
         {
-            $campo_universo='empleado';
-            $key_universo=Auth::user()->empleado;
+            $campo_universo='udn';
+            $key_universo=Auth::user()->udn;
         }
         if(Auth::user()->puesto=='Gerente')
         {
@@ -125,6 +126,45 @@ class ProcesaSeguimientoController extends Controller
                                 ->orderBy('created_at','desc')
                                 ->paginate(10);
             return(view('seguimiento_orden',['registros'=>$registros,'query'=>'']));
+        }
+    }
+    public function seguimiento_incidencias(Request $request)
+    {
+        $campo_universo='';
+        $key_universo='';
+    
+        if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
+        {
+            $campo_universo='empleado';
+            $key_universo=Auth::user()->empleado;
+        }
+        if(Auth::user()->puesto=='Gerente')
+        {
+            $campo_universo='udn';
+            $key_universo=Auth::user()->udn;
+        }
+        if(Auth::user()->puesto=='Regional')
+        {
+            $campo_universo='region';
+            $key_universo=Auth::user()->pdv;
+        }
+
+
+        if(isset($_GET['query']))
+        {
+            $registros=Incidencia::where($campo_universo,$key_universo)
+                                ->where('dia_incidencia',$_GET["query"])
+                                ->orderBy('dia_incidencia','desc')
+                                ->paginate(10);
+            $registros->appends($request->all());
+            return(view('seguimiento_incidencias',['registros'=>$registros,'query'=>$_GET['query']]));
+        }
+        else
+        {
+            $registros=Incidencia::where($campo_universo,$key_universo)
+                                ->orderBy('dia_incidencia','desc')
+                                ->paginate(10);
+            return(view('seguimiento_incidencias',['registros'=>$registros,'query'=>'']));
         }
     }
 }

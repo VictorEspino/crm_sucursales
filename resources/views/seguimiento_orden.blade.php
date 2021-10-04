@@ -171,7 +171,7 @@
                         if(this.responseText!='')
                         {
                             respuesta=JSON.parse(this.response);
-                            //console.log(respuesta);
+                            //console.log(this.responseText);
                             document.getElementById("id").value=respuesta.id;
                             document.getElementById("origen").value=respuesta.origen;
                             document.getElementById("cliente").value=respuesta.cliente;
@@ -239,7 +239,7 @@
                 xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xmlhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
-                         console.log("Actualizacion Exitosa");
+                         //console.log("Actualizacion Exitosa");
                          document.location.reload();
                          //console.log(this.responseText);
                         }

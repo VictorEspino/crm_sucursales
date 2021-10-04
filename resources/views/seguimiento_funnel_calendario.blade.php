@@ -39,6 +39,11 @@
                     <div class="flex flex-col p-3">
                         <div class="py-2 w-full flex flex-row text-xs text-gray-700 space-x-2">
                             <div class="w-full">
+                                Originado por: <input class="w-full rounded p-1 border border-white" type="text" id="nombre" readonly>
+                            </div>
+                        </div>
+                        <div class="py-2 w-full flex flex-row text-xs text-gray-700 space-x-2">
+                            <div class="w-full">
                                 Prospecto <input class="w-full rounded p-1 border border-white" type="text" id="cliente">
                                 <input class="hidden" type="text" id="id">
                             </div>
@@ -67,13 +72,13 @@
                         </div>
                         <div class="py-2 w-full flex flex-row text-xs text-gray-700 space-x-2">
                             <div class="w-1/3">
-                                Seguimiento 1 <input class="w-full rounded p-1 border border-gray-300" type="text" id="estatus1" placeholder="YYYY-MM-DD">
+                                Seguimiento 1 <input class="w-full rounded p-1 border border-gray-300" type="date" id="estatus1" placeholder="YYYY-MM-DD">
                             </div>
                             <div class="w-1/3">
-                                Seguimiento 2 <input class="w-full rounded p-1 border border-gray-300" type="text" id="estatus2" placeholder="YYYY-MM-DD">
+                                Seguimiento 2 <input class="w-full rounded p-1 border border-gray-300" type="date" id="estatus2" placeholder="YYYY-MM-DD">
                             </div>
                             <div class="w-1/3">
-                                Seguimiento 3 <input class="w-full rounded p-1 border border-gray-300" type="text" id="estatus3" placeholder="YYYY-MM-DD">
+                                Seguimiento 3 <input class="w-full rounded p-1 border border-gray-300" type="date" id="estatus3" placeholder="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="py-2 w-full flex flex-row text-xs text-gray-700 space-x-2">
@@ -88,7 +93,7 @@
                             </div>
                             <div class="w-1/2">
                                 <span class="text-xs">Fecha Siguiente Contacto</span><br>
-                                <input class="w-full rounded p-1 border border-gray-300" type="text" name="fecha_sig_contacto" id="fecha_sig_contacto" value="{{old('fecha_sig_contacto')}}" placeholder='YYYY-MM-DD'>
+                                <input class="w-full rounded p-1 border border-gray-300" type="date" name="fecha_sig_contacto" id="fecha_sig_contacto" value="{{old('fecha_sig_contacto')}}" placeholder='YYYY-MM-DD'>
                                 @error('fecha_sig_contacto')
                                   <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                                 @enderror                    
@@ -125,6 +130,7 @@
                             //console.log(respuesta);
                             document.getElementById("id").value=respuesta.id;
                             document.getElementById("origen").value=respuesta.origen;
+                            document.getElementById("nombre").value=respuesta.nombre;
                             document.getElementById("cliente").value=respuesta.cliente;
                             document.getElementById("telefono").value=respuesta.telefono;
                             document.getElementById("correo").value=respuesta.correo;
@@ -142,6 +148,7 @@
                         else
                         {
                             document.getElementById("id").value='';
+                            document.getElementById("nombre").value='';
                             document.getElementById("origen").value='';
                             document.getElementById("cliente").value='';
                             document.getElementById("telefono").value='';

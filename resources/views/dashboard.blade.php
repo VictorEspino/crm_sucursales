@@ -13,6 +13,7 @@
             Periodo&nbsp;&nbsp;
             <select class="w-1/6 rounded p-1 border border-gray-300" type="text" id="periodo">
                 <option value="2021-09" {{session('periodo')=='2021-09'?'selected':''}}>Septiembre 2021</option>
+                <option value="2021-10" {{session('periodo')=='2021-10'?'selected':''}}>Octubre 2021</option>
             </select>
 
         </div>

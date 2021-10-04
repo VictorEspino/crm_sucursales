@@ -17,7 +17,7 @@
             <div class="w-full flex flex-row space-x-2">
                 <div class="w-1/3">
                     <span class="text-xs">Dia de Trabajo</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="dia_trabajo" value="{{old('dia_trabajo')}}" placeholder="YYYY-MM-DD">
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="dia_trabajo" value="{{old('dia_trabajo')}}" placeholder="YYYY-MM-DD">
                     
                     @error('dia_trabajo')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
@@ -57,7 +57,19 @@
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
                 </div>                                
-            </div>            
+            </div> 
+            <div class="w-full text-base font-semibold space-x-2 py-3">
+                Depuracion de base de contactos
+            </div>  
+            <div class="w-full flex flex-row space-x-2">
+                <div class="w-1/4">
+                    <span class="text-xs">Minutos por limpieza de base</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="minutos_base" value="{{old('minutos_base')}}">                    
+                    @error('minutos_base')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>           
+            </div>         
         </div> <!--FIN CONTENIDO-->
         <div class="w-full flex justify-center py-4">
             <button class="rounded p-1 border bg-green-500 hover:bg-green-700 text-gray-100 font-semibold">Guardar</button>

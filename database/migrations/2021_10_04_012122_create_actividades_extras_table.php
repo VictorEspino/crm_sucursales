@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGeneracionDemandasTable extends Migration
+class CreateActividadesExtrasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateGeneracionDemandasTable extends Migration
      */
     public function up()
     {
-        Schema::create('generacion_demandas', function (Blueprint $table) {
+        Schema::create('actividades_extras', function (Blueprint $table) {
             $table->id();
             $table->integer('empleado'); //
             $table->string('nombre'); //
@@ -21,11 +21,8 @@ class CreateGeneracionDemandasTable extends Migration
             $table->string('pdv'); //
             $table->string('region'); //
             $table->date('dia_trabajo'); //
-            $table->integer('sms');
-            $table->integer('llamadas');
-            $table->integer('rs');
+            $table->string('tipo');
             $table->integer('minutos');
-            $table->integer('minutos_base')->default(0);
             $table->timestamps();
         });
     }
@@ -37,6 +34,6 @@ class CreateGeneracionDemandasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('generacion_demandas');
+        Schema::dropIfExists('actividades_extras');
     }
 }
