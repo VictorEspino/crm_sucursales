@@ -12,8 +12,9 @@
         <div class="w-full bg-white p-3 flex flex-col text-sm">
             Periodo&nbsp;&nbsp;
             <select class="w-1/6 rounded p-1 border border-gray-300" type="text" id="periodo">
-                <option value="2021-09" {{session('periodo')=='2021-09'?'selected':''}}>Septiembre 2021</option>
-                <option value="2021-10" {{session('periodo')=='2021-10'?'selected':''}}>Octubre 2021</option>
+                @foreach($periodos as $periodo)
+                <option value="{{$periodo->periodo}}" {{session('periodo')==$periodo->periodo?'selected':''}}>{{$periodo->periodo}}</option>
+                @endforeach
             </select>
 
         </div>
@@ -41,10 +42,16 @@
                 </div>
                 <div class="w-1/2 flex flex-col">
                     <div class="w-full pt-3 flex justify-center text-5xl font-semibold text-green-700">
-                    <a href="javascript:productividad()"><i class="far fa-check-circle"></i></a>
+                        <a href="javascript:productividad()"><i class="far fa-check-circle"></i></a>
                     </div>
                     <div class="w-full flex justify-center">
                         Dasboard Productividad
+                    </div>
+                    <div class="w-full pt-12 flex justify-center text-5xl font-semibold text-yellow-500">
+                        <a href="javascript:resumen_periodo()"><i class="far fa-calendar-alt"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Resumen periodo
                     </div>
                 </div>
             </div>
@@ -70,6 +77,11 @@
         {
             periodo=document.getElementById("periodo").value;
             document.location.href="/dashboard_productividad/"+periodo;
+        }
+        function resumen_periodo()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/dashboard_resumen_periodo/"+periodo;
         }
     </script>
 </x-app-layout>

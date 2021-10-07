@@ -31,7 +31,7 @@ class CreateOrdenesTable extends Migration
             $table->string('producto'); //
             $table->string('flujo'); //
             $table->string('plan'); //
-            $table->string('renta');
+            $table->float('renta');
             $table->string('equipo'); //
             $table->string('porcentaje_requerido'); //
             $table->string('monto_total'); //

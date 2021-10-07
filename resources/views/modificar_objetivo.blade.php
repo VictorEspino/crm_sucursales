@@ -37,7 +37,11 @@
                     <span class="text-xs">Periodo</span><br>
                     <select class="w-full rounded p-1 border border-gray-300" type="text" name="periodo" id="periodo" onChange="buscar_objetivo()">
                         <option value="" class=""></option>
-                        <option value="2021-09" class="" {{old('periodo')=="2021-09"?'selected':''}}>2021-09</option>
+                        @foreach ($periodos as $periodo)
+                            <option value="{{$periodo->periodo}}" class="" {{old('periodo')==$periodo->periodo?'selected':''}}>{{$periodo->periodo}}</option>    
+                        @endforeach
+                        
+                        
                     </select> 
                     @error('periodo')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>

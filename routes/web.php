@@ -17,13 +17,16 @@ use App\Http\Controllers\ExportController;
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware('auth');
+//Route::get('/', function () {
+//    return view('dashboard');
+//})->middleware('auth');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+//Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+//    return view('dashboard');
+//})->name('dashboard');
+
+Route::get('/',[DashboardsController::class,'dashboard_central'])->middleware('auth');
+Route::get('/dashboard',[DashboardsController::class,'dashboard_central'])->middleware('auth')->name('dashboard');
 
 Route::get('/plantilla_nuevo', function () {return view('plantilla_nuevo');})->middleware('auth')->name('plantilla_nuevo');
 Route::post('/plantilla_nuevo', [ProcesaFormasController::class,'plantilla_nuevo'])->middleware('auth')->name('plantilla_nuevo');
@@ -70,6 +73,9 @@ Route::post('/demanda_nuevo', [ProcesaFormasController::class,'demanda_nuevo'])-
 Route::get('/dashboard_productividad/{periodo}', [DashboardsController::class,'dashboard_productividad'])->middleware('auth')->name('dashboard_productividad');
 Route::get('/dashboard_productividad/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_productividad'])->middleware('auth')->name('dashboard_productividad');
 
+Route::get('/dashboard_resumen_periodo/{periodo}', [DashboardsController::class,'dashboard_resumen_periodo'])->middleware('auth')->name('dashboard_resumen_periodo');
+Route::get('/dashboard_resumen_periodo/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_resumen_periodo'])->middleware('auth')->name('dashboard_resumen_periodo');
+
 Route::get('/export_interaccion/{periodo}', [ExportController::class,'export_interaccion'])->middleware('auth');
 Route::get('/export_orden/{periodo}', [ExportController::class,'export_orden'])->middleware('auth');
 
@@ -80,7 +86,7 @@ Route::post('/incidencia_borrar', [ProcesaFormasController::class,'incidencia_bo
 Route::get('/actividad_extra_nuevo', function () {return view('actividad_extra_nuevo');})->middleware('auth')->name('actividad_extra_nuevo');
 Route::post('/actividad_extra_nuevo', [ProcesaFormasController::class,'actividad_extra_nuevo'])->middleware('auth')->name('actividad_extra_nuevo');
 
-Route::get('/objetivo_update', function () {return view('modificar_objetivo');})->middleware('auth')->name('objetivo_update');
+Route::get('/objetivo_update', [DashboardsController::class,'objetivo_form'])->middleware('auth')->name('objetivo_update');
 Route::post('/objetivo_update', [ProcesaFormasController::class,'objetivo_update'])->middleware('auth')->name('objetivo_update');
 
 Route::get('/objetivo_consulta/{periodo}/{udn}', [ProcesaFormasController::class,'objetivo_consulta'])->middleware('auth')->name('objetivo_consulta');

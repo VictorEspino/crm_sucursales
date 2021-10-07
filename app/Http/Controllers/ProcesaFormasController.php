@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 
 class ProcesaFormasController extends Controller
 {
+    
     public function plantilla_nuevo(Request $request)
     {
         $request->validate([
@@ -151,7 +152,7 @@ class ProcesaFormasController extends Controller
                 'f_nacimiento'=> 'date_format:Y-m-d',            
                 'tipo_o'=> 'required',
                 'orden_plan'=> 'required',
-                'orden_renta'=> 'required',
+                'orden_renta'=> 'required|numeric',
                 'estatus_final'=> 'required',
                 'numero_orden'=> 'required',
                 'flujo'=> 'required',
@@ -274,7 +275,7 @@ class ProcesaFormasController extends Controller
             'f_nacimiento'=> 'date_format:Y-m-d',            
             'tipo'=> 'required',
             'orden_plan'=> 'required',
-            'orden_renta'=> 'required',
+            'orden_renta'=> 'required|numeric',
             'estatus_final'=> 'required',
             'numero_orden'=> 'required',
             'flujo'=> 'required',

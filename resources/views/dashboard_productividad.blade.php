@@ -46,6 +46,7 @@
                     <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Funnel</td>
                     <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Ordenes</td>
                     <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Demanda</td>
+                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Otras</td>
                     <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Ejecutivos</td>                    
                     <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Minutos Productivos</td>
                     <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Incidencias</td>
@@ -64,8 +65,9 @@
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->funnel,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->ordenes,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->demanda,0)}}</td>
+                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->otras,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->ejecutivos,0)}}</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format(($detalle->interaccion+$detalle->funnel+$detalle->ordenes+$detalle->demanda),0)}}</td>
+                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format(($detalle->interaccion+$detalle->funnel+$detalle->ordenes+$detalle->demanda+$detalle->otras),0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->dias_incidencias,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format(($dias_transcurridos*$detalle->ejecutivos*$minutos_sucursal)-$detalle->incidencias,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>

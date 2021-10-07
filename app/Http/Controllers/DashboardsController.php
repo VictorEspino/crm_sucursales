@@ -13,6 +13,7 @@ use App\Models\GeneracionDemanda;
 use App\Models\Incidencia;
 use App\Models\User;
 use App\Models\Sucursal;
+use App\Models\EstaticoDias;
 
 class DashboardsController extends Controller
 {
@@ -99,6 +100,35 @@ class DashboardsController extends Controller
                 return(0);
             }
         }
+
+        
+    }
+    public function objetivo_form(Request $request)
+    {
+        $periodos=DB::select(DB::raw(
+            "select distinct periodo from estatico_dias where dia<=now() order by dia desc"
+        ));
+        $periodos=collect($periodos)->take(6);
+        return(view('modificar_objetivo',['periodos'=>$periodos]));
+    }
+    public function dashboard_central()
+    {
+        $periodos=DB::select(DB::raw(
+            "select distinct periodo from estatico_dias where dia<=now() order by dia desc"
+        ));
+        $periodos=collect($periodos)->take(6);
+        if(!session()->has('periodo'))
+        {
+            $ciclo=1;
+            foreach($periodos as $periodo)
+            {
+                if($ciclo==1)
+                {session()->put('periodo', $periodo->periodo);}
+                $ciclo=$ciclo+1;
+            }
+        }
+        return view('dashboard',['periodos'=>$periodos]);
+
 
         
     }
@@ -622,7 +652,7 @@ class DashboardsController extends Controller
           ]));
     }
     public function dashboard_productividad(Request $request)
-    {
+    {   
         $periodo=$request->periodo;
         session()->put('periodo', $periodo);
         $campo_universo='';
@@ -711,7 +741,6 @@ class DashboardsController extends Controller
         $query_tiempos=DB::select(DB::raw(
                 $sql_tiempos
             ));
-
         if($origen=="E")
         {
             $reg_incidencias=Incidencia::where($campo_universo,$key_universo)
@@ -788,7 +817,7 @@ class DashboardsController extends Controller
             $minutos_objetivo_acum=$minutos_objetivo_acum+$minutos_objetivo;
             $dias_transcurridos=$dias_transcurridos+1;
             $dias_incidencias=$dias_incidencias+$tiempo->dias_incidencias;
-            $minutos_productivos_acum=$minutos_productivos_acum+$tiempo->interaccion+$tiempo->funnel+$tiempo->ordenes+$tiempo->demanda;
+            $minutos_productivos_acum=$minutos_productivos_acum+$tiempo->interaccion+$tiempo->funnel+$tiempo->ordenes+$tiempo->demanda+$tiempo->otras;
             $minutos_incidencias_acum=$minutos_incidencias_acum+$tiempo->incidencias;
         }
                           
@@ -802,20 +831,24 @@ class DashboardsController extends Controller
             {
                 $eje_fix="1";
             }
-            $sql_detalles="select llave,value,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,".$eje_fix." as ejecutivos,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias from (
-                select ".$campos_vista.",sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
+            $sql_detalles="select llave,value,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,".$eje_fix." as ejecutivos,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
+                select ".$campos_vista.",sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
                 UNION
-                select ".$campos_vista.",0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
+                select ".$campos_vista.",0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
                 UNION
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
                 UNION
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by ".$campos_group."
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by ".$campos_group."
                 UNION
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,sum(minutos) as incidencias,count(*) as dias_incidencias from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' group by ".$campos_group."
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' group by ".$campos_group."
+                UNION
+                select ".$campos_vista.",0 as interaccion,sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes, 0 as demanda, 0 as ejecutivos, 0 as incidencias, 0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group." 
+                UNION
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group." 
                 ";
             $sql_adicional_detalles="
                 UNION 
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(ejecutivos) as ejecutivos,0 as incidencias,0 as dias_incidencias from objetivos where ".$campo_universo." = '".$key_universo."' and periodo ='".$periodo."' group by ".$campos_group."";
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(ejecutivos) as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from objetivos where ".$campo_universo." = '".$key_universo."' and periodo ='".$periodo."' group by ".$campos_group."";
             if($origen=="R")
             {
                 $sql_detalles=$sql_detalles."".$sql_adicional_detalles;
@@ -846,5 +879,316 @@ class DashboardsController extends Controller
                                                 'reg_incidencias'=>$reg_incidencias,
                                                 'details'=>$details
           ]));
+    }
+    public function dashboard_resumen_periodo(Request $request)
+    {
+        $periodo=$request->periodo;
+        session()->put('periodo', $periodo);
+        $campo_universo='';
+        $key_universo='';
+        $titulo='';
+        $origen='';
+        $campos_group="";
+        $nav_origen="PRINCIPAL";
+        if(isset($request->tipo))
+        {
+            $nav_origen="DRILLDOWN";
+            if($request->tipo=="E")
+            {
+                $campo_universo='empleado';
+                $key_universo=$request->key;
+                $titulo=$request->value;
+                $origen='E';
+                
+            }
+            if($request->tipo=="G")
+            {
+                $campo_universo='udn';
+                $key_universo=$request->key;
+                $titulo=$request->value;
+                $origen='G';
+                $campos_group='empleado,nombre';
+                $campos_vista="empleado as llave,nombre as value";
+            }
+            if($request->tipo=="R")
+            {
+                $campo_universo='region';
+                $key_universo=$request->key;
+                $titulo=$request->value;
+                $origen='R';
+                $campos_group='udn,pdv';
+                $campos_vista="udn as llave,pdv as value";
+            }
+        }
+        else{
+            if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
+            {
+                $campo_universo='empleado';
+                $key_universo=Auth::user()->empleado;
+                $titulo=Auth::user()->name;
+                $origen='E';
+            }
+            if(Auth::user()->puesto=='Gerente')
+            {
+                $campo_universo='udn';
+                $key_universo=Auth::user()->udn;
+                $titulo=Auth::user()->pdv;
+                $origen='G';
+                $campos_group='empleado,nombre';
+                $campos_vista="empleado as llave,nombre as value";
+            }
+            if(Auth::user()->puesto=='Regional')
+            {
+                $campo_universo='region';
+                $key_universo=Auth::user()->pdv;
+                $titulo=Auth::user()->region;
+                $origen='R';
+                $campos_group='udn,pdv';
+                $campos_vista="udn as llave,pdv as value";
+            }
+        }
+        $ac=0;
+        $as=0;
+        $rc=0;
+        $rs=0;
+        $min_diario=0;
+        $ejecutivos=0;
+        if($origen=="E")
+        {
+            $usuario=User::where('empleado',$key_universo)->get()->first();
+            $objetivos=Objetivo::select(DB::raw('udn,sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
+                            ->where('udn',$usuario->udn)
+                            ->where('periodo',$periodo)
+                            ->groupBy('udn')
+                            ->get();
+
+            foreach($objetivos as $objetivo)
+            {
+                $ejecutivos_sucursal=$objetivo->ejecutivos;
+                $ac=$objetivo->ac/$ejecutivos_sucursal;
+                $as=$objetivo->asi/$ejecutivos_sucursal;
+                $rc=$objetivo->rc/$ejecutivos_sucursal;
+                $rs=$objetivo->rs/$ejecutivos_sucursal;
+                $min_diario=$objetivo->min_diario;
+                $ejecutivos=1;
+            }
+        }
+        else
+        {
+            $objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
+                            ->where($campo_universo,$key_universo)
+                            ->where('periodo',$periodo)
+                            ->groupBy($campo_universo)
+                            ->get();
+
+            foreach($objetivos as $objetivo)
+            {
+                $ac=$objetivo->ac;
+                $as=$objetivo->asi;
+                $rc=$objetivo->rc;
+                $rs=$objetivo->rs;
+                $min_diario=$objetivo->min_diario;
+                $ejecutivos=$objetivo->ejecutivos;
+            }
+        }
+        
+
+        //return($objetivos);
+
+        $avances=Ordenes::select(DB::raw('producto, count(*) as lineas,sum(renta) as rentas'))
+                        ->where($campo_universo,$key_universo)
+                        ->whereRaw("lpad(created_at,7,0)=?",$periodo)
+                        ->where('estatus_final','ACEPTADA - Facturada')
+                        ->groupBy('producto')
+                        ->get();
+
+        $av_ac=$av_as=$av_rc=$av_rs=0;
+        $rp_ac=$rp_as=$rp_rc=$rp_rs=0;
+        $total_movimientos=0;
+        foreach($avances as $avance)
+        {
+            $total_movimientos=$total_movimientos+$avance->lineas;
+            if($avance->producto=='Activacion CON equipo'){$av_ac=$avance->lineas;$rp_ac=$avance->rentas/$avance->lineas;}
+            if($avance->producto=='Activacion SIN equipo'){$av_as=$avance->lineas;$rp_as=$avance->rentas/$avance->lineas;}
+            if($avance->producto=='Renovacion CON equipo'){$av_rc=$avance->lineas;$rp_rc=$avance->rentas/$avance->lineas;}
+            if($avance->producto=='Renovacion SIN equipo'){$av_rs=$avance->lineas;$rp_rs=$avance->rentas/$avance->lineas;}
+        }
+
+        $avances=Ordenes::select(DB::raw('producto, count(*) as lineas,sum(renta) as rentas'))
+                        ->where($campo_universo,$key_universo)
+                        ->whereRaw("lpad(created_at,7,0)=?",$periodo)
+                        ->where('created_at','<=',$periodo.'-15')
+                        ->where('estatus_final','ACEPTADA - Facturada')
+                        ->groupBy('producto')
+                        ->get();
+
+        $av_ac_q1=$av_as_q1=$av_rc_q1=$av_rs_q1=0;
+        $rp_ac_q1=$rp_as_q1=$rp_rc_q1=$rp_rs_q1=0;
+        $total_movimientos_q1=0;
+        foreach($avances as $avance)
+        {
+            $total_movimientos_q1=$total_movimientos_q1+$avance->lineas;
+            if($avance->producto=='Activacion CON equipo'){$av_ac_q1=$avance->lineas;$rp_ac_q1=$avance->rentas/$avance->lineas;}
+            if($avance->producto=='Activacion SIN equipo'){$av_as_q1=$avance->lineas;$rp_as_q1=$avance->rentas/$avance->lineas;}
+            if($avance->producto=='Renovacion CON equipo'){$av_rc_q1=$avance->lineas;$rp_rc_q1=$avance->rentas/$avance->lineas;}
+            if($avance->producto=='Renovacion SIN equipo'){$av_rs_q1=$avance->lineas;$rp_rs_q1=$avance->rentas/$avance->lineas;}
+        }
+
+
+
+        $dias_transcurridos=EstaticoDias::select(DB::raw('SUBSTRING(max(dia),9,2)*1 as transcurridos'))
+                                            ->where('periodo',$periodo)
+                                            ->whereRaw('dia<=now()')
+                                            ->get()
+                                            ->first();
+        $dias_total=EstaticoDias::select(DB::raw('SUBSTRING(max(dia),9,2)*1 as total'))
+                                            ->where('periodo',$periodo)
+                                            ->get()
+                                            ->first();
+
+
+        $sql_tiempos="
+        select lpad(dia,7,0) as periodo,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
+            SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
+            UNION
+            select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            UNION
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            UNION
+            select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            UNION
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by dia_trabajo
+            UNION
+            select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' group by dia_incidencia
+            UNION
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            UNION
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by dia_trabajo
+        )as a group by lpad(dia,7,0)
+        ";
+        //return($sql_tiempos);
+        $query_tiempos=DB::select(DB::raw(
+                $sql_tiempos
+            ));
+
+        $tiempo_productivo=0;
+        $incidencias=0;
+        foreach($query_tiempos as $tiempos)
+        {
+            $tiempo_productivo=$tiempo_productivo+$tiempos->interaccion;
+            $tiempo_productivo=$tiempo_productivo+$tiempos->funnel;
+            $tiempo_productivo=$tiempo_productivo+$tiempos->ordenes;
+            $tiempo_productivo=$tiempo_productivo+$tiempos->demanda;
+            $tiempo_productivo=$tiempo_productivo+$tiempos->otras;
+
+            $incidencias=$incidencias+$tiempos->incidencias;
+        }
+        //return('min_diario='.$min_diario.', dias_transcurridos='.$dias_transcurridos->transcurridos.', Incidencias='.$incidencias);
+        $minutos_objetivo=$ejecutivos*$min_diario*$dias_transcurridos->transcurridos-$incidencias;
+        
+        $p_productividad=$minutos_objetivo>0?100*$tiempo_productivo/$minutos_objetivo:0;
+
+        $sql_tiempos_q1="
+        select lpad(dia,7,0) as periodo,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
+            SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
+            UNION
+            select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            UNION
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            UNION
+            select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            UNION
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$periodo."-15' group by dia_trabajo
+            UNION
+            select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' and dia_incidencia<='".$periodo."-15' group by dia_incidencia
+            UNION
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            UNION
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$periodo."-15' group by dia_trabajo
+        )as a group by lpad(dia,7,0)
+        ";
+        //return($sql_tiempos_q1);
+        $query_tiempos_q1=DB::select(DB::raw(
+                $sql_tiempos_q1
+            ));
+
+        $tiempo_productivo_q1=0;
+        $incidencias_q1=0;
+        foreach($query_tiempos_q1 as $tiempos)
+        {
+            $tiempo_productivo_q1=$tiempo_productivo_q1+$tiempos->interaccion;
+            $tiempo_productivo_q1=$tiempo_productivo_q1+$tiempos->funnel;
+            $tiempo_productivo_q1=$tiempo_productivo_q1+$tiempos->ordenes;
+            $tiempo_productivo_q1=$tiempo_productivo_q1+$tiempos->demanda;
+            $tiempo_productivo_q1=$tiempo_productivo_q1+$tiempos->otras;
+
+            $incidencias_q1=$incidencias_q1+$tiempos->incidencias;
+        }
+        $minutos_objetivo_q1=$ejecutivos*$min_diario*($dias_transcurridos->transcurridos>=15?15:$dias_transcurridos->transcurridos)-$incidencias_q1;
+            
+        $p_productividad_q1=$minutos_objetivo_q1>0?100*$tiempo_productivo_q1/$minutos_objetivo_q1:0;
+        
+        $minutos_objetivo_q2=$minutos_objetivo-$minutos_objetivo_q1;
+        $tiempo_productivo_q2=$tiempo_productivo-$tiempo_productivo_q1;
+        $p_productividad_q2=$minutos_objetivo_q2>0?100*$tiempo_productivo_q2/$minutos_objetivo_q2:0;
+        
+        $detalles=[];
+        if($origen=="R")
+        {
+            $detalles=Ordenes::select(DB::raw('distinct udn as llave, pdv as value'))
+                                ->where('region',$titulo)
+                                ->where('pdv','<>',$titulo)
+                                ->whereRaw('lpad(created_at,7,0)=?',$periodo)
+                                ->get();
+        }
+        if($origen=="G")
+        {
+            $detalles=Ordenes::select(DB::raw('distinct empleado as llave, nombre as value'))
+                                ->where('udn',$key_universo)
+                                ->whereRaw('lpad(created_at,7,0)=?',$periodo)
+                                ->get();
+        }
+
+
+        return view('dashboard_resumen_periodo',['periodo'=>$periodo,
+                                                    'origen'=>$origen,
+                                                    'nav_origen'=>$nav_origen,
+                                                    'titulo'=>$titulo,
+                                                    'ac'=>$ac,
+                                                    'as'=>$as,
+                                                    'rc'=>$rc,
+                                                    'rs'=>$rs,
+                                                    'av_ac'=>$av_ac,
+                                                    'av_as'=>$av_as,
+                                                    'av_rc'=>$av_rc,
+                                                    'av_rs'=>$av_rs,
+                                                    'rp_ac'=>$rp_ac,
+                                                    'rp_as'=>$rp_as,
+                                                    'rp_rc'=>$rp_rc,
+                                                    'rp_rs'=>$rp_rs,
+                                                    'av_ac_q1'=>$av_ac_q1,
+                                                    'av_as_q1'=>$av_as_q1,
+                                                    'av_rc_q1'=>$av_rc_q1,
+                                                    'av_rs_q1'=>$av_rs_q1,
+                                                    'rp_ac_q1'=>$rp_ac_q1,
+                                                    'rp_as_q1'=>$rp_as_q1,
+                                                    'rp_rc_q1'=>$rp_rc_q1,
+                                                    'rp_rs_q1'=>$rp_rs_q1,
+                                                    'transcurridos'=>$dias_transcurridos->transcurridos,
+                                                    'total_dias'=>$dias_total->total,
+                                                    'total_movimientos'=>$total_movimientos,
+                                                    'total_movimientos_q1'=>$total_movimientos_q1,
+                                                    'p_productividad'=>$p_productividad,
+                                                    'p_productividad_q1'=>$p_productividad_q1,
+                                                    'p_productividad_q2'=>$p_productividad_q2,
+                                                    'minutos_objetivo'=>$minutos_objetivo,
+                                                    'tiempo_productivo'=>$tiempo_productivo,
+                                                    'minutos_objetivo_q1'=>$minutos_objetivo_q1,
+                                                    'tiempo_productivo_q1'=>$tiempo_productivo_q1,
+                                                    'minutos_objetivo_q2'=>$minutos_objetivo_q2,
+                                                    'tiempo_productivo_q2'=>$tiempo_productivo_q2,
+                                                    'detalles'=>$detalles
+                                                ]);
+
     }
 }

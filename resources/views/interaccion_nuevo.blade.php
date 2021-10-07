@@ -226,19 +226,20 @@
             </div>
             <div class="w-full flex flex-row space-x-2">
                 <div class="w-1/3">
-                    <span class="text-xs">Edad</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="edad" value="{{old('edad')}}">                    
-                    @error('edad')
-                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
-                    @enderror                    
-                </div>
-                <div class="w-1/3">
                     <span class="text-xs">Fecha Nacimiento</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="f_nacimiento" value="{{old('f_nacimiento')}}" placeholder="YYYY-MM-DD">
+                    <input class="w-full rounded p-1 border border-gray-300" type="date" name="f_nacimiento" id="f_nacimiento" value="{{old('f_nacimiento')}}" placeholder="YYYY-MM-DD" onchange='calcula_edad()'>
                     @error('f_nacimiento')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
                 </div>
+                <div class="w-1/3">
+                    <span class="text-xs">Edad</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="edad" id="edad" value="{{old('edad')}}" readonly>                    
+                    @error('edad')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                
                 <div class="w-1/3">
                     <span class="text-xs">Genero</span><br>
                     <select class="w-full rounded p-1 border border-gray-300" type="text" name="genero">
@@ -393,6 +394,14 @@
                     -->
     </div>
     </form>
+    <script>
+        function calcula_edad()
+        {
+            var enteredDate = document.getElementById('f_nacimiento').value;
+            var years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
+            document.getElementById('edad').value=years;
+        }
+    </script>
     <script>
         function show_funnel()
         {
