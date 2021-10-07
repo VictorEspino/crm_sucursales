@@ -266,7 +266,7 @@
         </div>
         
         <?php
-            if($origen=="G" || $origen=="R")
+            if($origen=="G" || $origen=="R" ||$origen=="D")
             //if(false)
             {
         ?>
@@ -289,7 +289,7 @@
                 {
                 ?>
                 <tr>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><a href="/dashboard_orden/{{$periodo}}/{{$origen=='G'?'E':'G'}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->llave}}</a></td>
+                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><a href="/dashboard_orden/{{$periodo}}/{{($origen=="G"?'E':($origen=="R"?"G":"R"))}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->llave}}</a></td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3">{{$detalle->value}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->aceptadas,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->facturadas,0)}}</td>

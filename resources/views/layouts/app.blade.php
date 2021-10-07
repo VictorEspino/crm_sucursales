@@ -179,6 +179,7 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                             </li>
                             @endif
                             @endif
+                            @if(Auth::user()->puesto!='Director')
                             <li class="w-full h-full py-3 px-2 border-b border-light-border bg-blue-200">
                                 Actividad
                             </li>
@@ -263,6 +264,7 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
                             </li>
+                            @endif
                         </ul>
 
                     </div>

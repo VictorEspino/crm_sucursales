@@ -72,7 +72,7 @@
             </div>
         <?php 
                 $color=true;
-                if($origen=="R" || $origen=="G")
+                if($origen=="R" || $origen=="G" || $origen=="D")
                 {
         ?>
             <div class="w-full flex justify-center pt-4 text-sm">
@@ -91,7 +91,7 @@
                 {
                     $ev_detalle=0;
                     $ei_detalle=0;
-                    $liga='/dashboard_efectividad/'.$periodo.'/'.($origen=="G"?'E':'G').'/'.$detalle->llave."/".$detalle->value;
+                    $liga='/dashboard_efectividad/'.$periodo.'/'.($origen=="G"?'E':($origen=="R"?"G":"R")).'/'.$detalle->llave."/".$detalle->value;
                     try{
                         $ev_detalle=100*$detalle->facturadas/$detalle->visitas;
                     }

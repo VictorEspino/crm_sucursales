@@ -191,7 +191,7 @@
             </div>
         </div>
         <?php
-            if($origen=="G" || $origen=="R")
+            if($origen=="G" || $origen=="R"||$origen=="D")
             {
         ?>
         <div class="w-full bg-gray-200 p-3 flex flex-col">
@@ -213,7 +213,7 @@
                 {
                 ?>
                 <tr>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><a href="/dashboard_interaccion/{{$periodo}}/{{$origen=='G'?'E':'G'}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->llave}}</a></td>
+                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><a href="/dashboard_interaccion/{{$periodo}}/{{($origen=="G"?'E':($origen=="R"?"G":"R"))}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->llave}}</a></td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3">{{$detalle->value}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->sin_intencion,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->intencion,0)}}</td>

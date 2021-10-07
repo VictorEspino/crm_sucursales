@@ -25,7 +25,7 @@
                         <a href="javascript:efectividad()"><i class="fas fa-funnel-dollar"></i></a>
                     </div>
                     <div class="w-full flex justify-center">
-                        Dasboard Efectividad
+                        Dasboard Efectividad Flujo
                     </div>
                     <div class="w-full pt-12 flex justify-center text-5xl font-semibold text-blue-700">
                     <a href="javascript:interaccion()"><i class="fas fa-hands-helping"></i></a>
@@ -52,6 +52,12 @@
                     </div>
                     <div class="w-full flex justify-center">
                         Resumen periodo
+                    </div>
+                    <div class="w-full pt-12 flex justify-center text-5xl font-semibold text-green-400">
+                        <a href="javascript:resumen_efectividad()"><i class="fas fa-receipt"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Resumen efectividad
                     </div>
                 </div>
             </div>
@@ -82,6 +88,11 @@
         {
             periodo=document.getElementById("periodo").value;
             document.location.href="/dashboard_resumen_periodo/"+periodo;
+        }
+        function resumen_efectividad()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/dashboard_resumen_efectividad/"+periodo;
         }
     </script>
 </x-app-layout>

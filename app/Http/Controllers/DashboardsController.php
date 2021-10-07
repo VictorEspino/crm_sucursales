@@ -44,9 +44,26 @@ class DashboardsController extends Controller
             $campos_group='a.udn,a.pdv';
             $campos_vista="udn as llave,pdv as value";
         }
-        $ordenes=Ordenes::select(DB::raw('count(*) as facturadas'))
-                ->where($campo_universo,$key_universo)
+        if(Auth::user()->puesto=='Director')
+        {
+            $campo_universo=0;
+            $key_universo=0;
+            $titulo='Sucursales';
+            $origen='D';
+            $campos_group='a.region';
+            $campos_vista="region as llave,region as value";
+        }
+        $ordenes_tienda=Ordenes::select(DB::raw('count(*) as facturadas'))
+                ->whereRaw(''.$campo_universo.'=?',$key_universo)
                 ->where('estatus_final','ACEPTADA - Facturada')
+                ->where('origen','Tienda')
+                ->whereRaw("lpad(created_at,7,0) = lpad(now(),7,0)")
+                ->get()
+                ->first();
+        $ordenes_demanda=Ordenes::select(DB::raw('count(*) as facturadas'))
+                ->whereRaw(''.$campo_universo.'=?',$key_universo)
+                ->where('estatus_final','ACEPTADA - Facturada')
+                ->where('origen','!=','Tienda')
                 ->whereRaw("lpad(created_at,7,0) = lpad(now(),7,0)")
                 ->get()
                 ->first();
@@ -54,13 +71,13 @@ class DashboardsController extends Controller
         if($tipo=="1")
         {
             $visitas=Interaccion::select(DB::raw('count(*) as visitas'))
-                ->where($campo_universo,$key_universo)
+                ->whereRaw(''.$campo_universo.'=?',$key_universo)
                 ->whereRaw("lpad(created_at,7,0) = lpad(now(),7,0)")
                 ->get()
                 ->first();
             if($visitas->visitas!="0")
             {
-                return(number_format(100*$ordenes->facturadas/$visitas->visitas,0));
+                return(number_format(100*$ordenes_tienda->facturadas/$visitas->visitas,0));
             }
             else
             {
@@ -70,13 +87,13 @@ class DashboardsController extends Controller
         if($tipo=="2")
         {
             $ordenes_total=Ordenes::select(DB::raw('count(*) as total'))
-                ->where($campo_universo,$key_universo)
+                ->whereRaw(''.$campo_universo.'=?',$key_universo)
                 ->whereRaw("lpad(created_at,7,0) = lpad(now(),7,0)")
                 ->get()
                 ->first();
             if($ordenes_total->total!="0")
             {
-                return(number_format(100*$ordenes->facturadas/$ordenes_total->total,0));
+                return(number_format(100*($ordenes_tienda->facturadas+$ordenes_demanda->facturadas)/$ordenes_total->total,0));
             }
             else
             {
@@ -86,14 +103,14 @@ class DashboardsController extends Controller
         if($tipo=="3")
         {
             $visitas=Interaccion::select(DB::raw('count(*) as visitas'))
-                ->where($campo_universo,$key_universo)
+                ->whereRaw(''.$campo_universo.'=?',$key_universo)
                 ->where('intencion',1)
                 ->whereRaw("lpad(created_at,7,0) = lpad(now(),7,0)")
                 ->get()
                 ->first();
             if($visitas->visitas!="0")
             {
-                return(number_format(100*$ordenes->facturadas/$visitas->visitas,0));
+                return(number_format(100*$ordenes_tienda->facturadas/$visitas->visitas,0));
             }
             else
             {
@@ -202,40 +219,51 @@ class DashboardsController extends Controller
                 $campos_group='a.udn,a.pdv';
                 $campos_vista="udn as llave,pdv as value";
             }
+            if(Auth::user()->puesto=='Director')
+            {
+                $campo_universo=0;
+                $key_universo=0;
+                $titulo='Sucursales';
+                $origen='D';
+                $campos_group='a.region';
+                $campos_vista="region as llave,region as value";
+            }
         }
-        
         $query_visitas=Interaccion::select(DB::raw("count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->get()
             ->first();
         $query_intencion=Interaccion::select(DB::raw("count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('intencion',1)
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->get()
             ->first();
         $query_solicitudes=Interaccion::select(DB::raw("count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('fin_interaccion','Orden')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->get()
             ->first();
         $query_aprobadas=Ordenes::select(DB::raw("count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('estatus_final','like','ACEPTADA%')
+            ->where('origen','Tienda')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->get()
             ->first();
         $query_facturadas=Ordenes::select(DB::raw("count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('estatus_final','like','ACEPTADA - F%')
+            ->where('origen','Tienda')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->get()
             ->first();
         $query_productos=Ordenes::select(DB::raw('producto,count(*) as ordenes'))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('estatus_final','like','ACEPTADA - F%')
+            ->where('origen','Tienda')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('producto')
             ->get();
@@ -261,12 +289,21 @@ class DashboardsController extends Controller
         
         
         try{
+        $query_cuotas=[];
+        if($origen!="D")
+        {
         $query_cuotas=Objetivo::select(DB::raw($campo_universo.",sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(ejecutivos) as ejecutivos"))
-            ->where($campo_universo,$key_universo)
             ->where('periodo',$periodo)
             ->groupBy($campo_universo)
             ->get()
             ->first();
+        }
+        else {
+            $query_cuotas=Objetivo::select(DB::raw('sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(ejecutivos) as ejecutivos'))
+            ->where('periodo',$periodo)
+            ->get()
+            ->first();
+        }
 
         $c_ac=$query_cuotas->ac;
         $c_as=$query_cuotas->asi;
@@ -331,14 +368,14 @@ class DashboardsController extends Controller
 
         //OBTIENE TABLA DE DETALLES
         $details=0;
-        if($origen=='G'||$origen=='R')
+        if($origen=='G'||$origen=='R'||$origen=='D')
         {
             $sql_detalles="select ".$campos_vista.",visitas,intencion,facturadas from (select ".$campos_group.",sum(visitas) as visitas,sum(intencion) as intencion,sum(facturadas) as facturadas from (";
             $sql_detalles=$sql_detalles."select ".$campos_group.",count(*) as visitas,0 as intencion,0 as facturadas  from interaccions as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."'  group by ".$campos_group;
             $sql_detalles=$sql_detalles." UNION ";
             $sql_detalles=$sql_detalles."select ".$campos_group.",0 as visitas,count(*) as intencion,0 as facturadas  from interaccions as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and intencion=1 group by ".$campos_group;
             $sql_detalles=$sql_detalles." UNION ";
-            $sql_detalles=$sql_detalles."SELECT ".$campos_group.",0 as visitas,0 as intencion, count(*) as facturadas from ordenes as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and estatus_final='ACEPTADA - Facturada' group by ".$campos_group;
+            $sql_detalles=$sql_detalles."SELECT ".$campos_group.",0 as visitas,0 as intencion, count(*) as facturadas from ordenes as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and estatus_final='ACEPTADA - Facturada' and origen='Tienda' group by ".$campos_group;
             $sql_detalles=$sql_detalles.") as a group by ".$campos_group.") as a order by a.facturadas desc";
             
             $details=DB::select(DB::raw(
@@ -440,6 +477,15 @@ class DashboardsController extends Controller
                 $campos_group='a.udn,a.pdv';
                 $campos_vista="udn as llave,pdv as value";
             }
+            if(Auth::user()->puesto=='Director')
+            {
+                $campo_universo=0;
+                $key_universo=0;
+                $titulo='Sucursales';
+                $origen='D';
+                $campos_group='a.region';
+                $campos_vista="region as llave,region as value";
+            }
         }
 
         $ci=0;
@@ -448,7 +494,7 @@ class DashboardsController extends Controller
         $ps=0;
         $total=0;
         $query_intencion=Interaccion::select(DB::raw("intencion,count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('intencion')
             ->get();
@@ -472,25 +518,25 @@ class DashboardsController extends Controller
         }
         
         $query_tramite_c=Interaccion::select(DB::raw("tramite,count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('intencion','1')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('tramite')
             ->get();
         $query_fin_c=Interaccion::select(DB::raw("fin_interaccion,count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('intencion','1')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('fin_interaccion')
             ->get();
         $query_tramite_s=Interaccion::select(DB::raw("tramite,count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('intencion','0')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('tramite')
             ->get();
         $query_fin_s=Interaccion::select(DB::raw("fin_interaccion,count(*) as visitas"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('intencion','0')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('fin_interaccion')
@@ -498,7 +544,7 @@ class DashboardsController extends Controller
 
         //OBTIENE TABLA DE DETALLES
         $details=0;
-        if($origen=='G'||$origen=='R')
+        if($origen=='G'||$origen=='R'||$origen=="D")
         {
             $sql_detalles="select ".$campos_vista.",sin_intencion,intencion,total from (select ".$campos_group.",sum(sin_intencion) as sin_intencion,sum(intencion) as intencion,sum(total) as total from (";
             $sql_detalles=$sql_detalles."select ".$campos_group.",count(*) as sin_intencion,0 as intencion,0 as total from interaccions as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and intencion=0 group by ".$campos_group;
@@ -594,39 +640,49 @@ class DashboardsController extends Controller
                 $campos_group='a.udn,a.pdv';
                 $campos_vista="udn as llave,pdv as value";
             }
+            if(Auth::user()->puesto=='Director')
+            {
+                $campo_universo=0;
+                $key_universo=0;
+                $titulo='Sucursales';
+                $origen='D';
+                $campos_group='a.region';
+                $campos_vista="region as llave,region as value";
+            }
+            
         }
         $query_general=Ordenes::select(DB::raw("estatus_final,count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('estatus_final')
             ->get();
         $query_ac=Ordenes::select(DB::raw("estatus_final,count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('producto','Activacion CON equipo')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('estatus_final')
             ->get();
         $query_as=Ordenes::select(DB::raw("estatus_final,count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('producto','Activacion SIN equipo')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('estatus_final')
             ->get();
         $query_rc=Ordenes::select(DB::raw("estatus_final,count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('producto','Renovacion CON equipo')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('estatus_final')
             ->get();
         $query_rs=Ordenes::select(DB::raw("estatus_final,count(*) as ordenes"))
-            ->where($campo_universo,$key_universo)
+            ->whereRaw(''.$campo_universo.'=?',$key_universo)
             ->where('producto','Renovacion SIN equipo')
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('estatus_final')
             ->get();
 
             $details=0;
-            if($origen=='G'||$origen=='R')
+            if($origen=='G'||$origen=='R'||$origen=="D")
             {
                 $sql_detalles="select ".$campos_vista.",aceptadas,facturadas,pendientes from (select ".$campos_group.",sum(aceptadas) as aceptadas,sum(facturadas) as facturadas,sum(pendientes) as pendientes from (";
                 $sql_detalles=$sql_detalles."select ".$campos_group.",count(*) as aceptadas,0 as facturadas,0 as pendientes from ordenes as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and estatus_final like '%ACEPTADA%' group by ".$campos_group;
@@ -717,6 +773,15 @@ class DashboardsController extends Controller
                 $campos_group='udn,pdv';
                 $campos_vista="udn as llave,pdv as value";
             }
+            if(Auth::user()->puesto=='Director')
+            {
+                $campo_universo=0;
+                $key_universo=0;
+                $titulo='Sucursales';
+                $origen='D';
+                $campos_group='region';
+                $campos_vista="region as llave,region as value";
+            }
         }
         $sql_tiempos="
             select dia,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
@@ -743,7 +808,7 @@ class DashboardsController extends Controller
             ));
         if($origen=="E")
         {
-            $reg_incidencias=Incidencia::where($campo_universo,$key_universo)
+            $reg_incidencias=Incidencia::whereRaw(''.$campo_universo.'=?',$key_universo)
                                         ->whereRaw("lpad(dia_incidencia,7,0)=?", [$periodo])
                                         ->get();
         }
@@ -767,7 +832,7 @@ class DashboardsController extends Controller
         }
         $query_objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ejecutivos) as ejecutivos,sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs'))
                             ->where('periodo',$periodo)
-                            ->where($campo_universo,$key_universo)
+                            ->whereRaw(''.$campo_universo.'=?',$key_universo)
                             ->groupBy($campo_universo)
                             ->get()
                             ->first();
@@ -824,7 +889,7 @@ class DashboardsController extends Controller
 
 
         $details=0;
-        if($origen=='G'||$origen=='R')
+        if($origen=='G'||$origen=='R'||$origen=="D")
         {   
             $eje_fix="sum(ejecutivos)";
             if($origen=='G')
@@ -849,13 +914,13 @@ class DashboardsController extends Controller
             $sql_adicional_detalles="
                 UNION 
                 select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(ejecutivos) as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from objetivos where ".$campo_universo." = '".$key_universo."' and periodo ='".$periodo."' group by ".$campos_group."";
-            if($origen=="R")
+            if($origen=="R" || $origen=="D")
             {
                 $sql_detalles=$sql_detalles."".$sql_adicional_detalles;
             }
             $sql_final=")as a group by a.llave,a.value";
             $sql_detalles=$sql_detalles."".$sql_final;
-            //return($sql_detalles);
+
             $details=DB::select(DB::raw(
                 $sql_detalles
             ));
@@ -946,6 +1011,15 @@ class DashboardsController extends Controller
                 $campos_group='udn,pdv';
                 $campos_vista="udn as llave,pdv as value";
             }
+            if(Auth::user()->puesto=='Director')
+            {
+                $campo_universo=0;
+                $key_universo=0;
+                $titulo='Sucursales';
+                $origen='D';
+                $campos_group='region';
+                $campos_vista="region as llave,region as value";
+            }
         }
         $ac=0;
         $as=0;
@@ -976,7 +1050,7 @@ class DashboardsController extends Controller
         else
         {
             $objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
-                            ->where($campo_universo,$key_universo)
+                            ->whereRaw(''.$campo_universo.'=?',$key_universo)
                             ->where('periodo',$periodo)
                             ->groupBy($campo_universo)
                             ->get();
@@ -996,7 +1070,7 @@ class DashboardsController extends Controller
         //return($objetivos);
 
         $avances=Ordenes::select(DB::raw('producto, count(*) as lineas,sum(renta) as rentas'))
-                        ->where($campo_universo,$key_universo)
+                        ->whereRaw(''.$campo_universo.'=?',$key_universo)
                         ->whereRaw("lpad(created_at,7,0)=?",$periodo)
                         ->where('estatus_final','ACEPTADA - Facturada')
                         ->groupBy('producto')
@@ -1015,7 +1089,7 @@ class DashboardsController extends Controller
         }
 
         $avances=Ordenes::select(DB::raw('producto, count(*) as lineas,sum(renta) as rentas'))
-                        ->where($campo_universo,$key_universo)
+                        ->whereRaw(''.$campo_universo.'=?',$key_universo)
                         ->whereRaw("lpad(created_at,7,0)=?",$periodo)
                         ->where('created_at','<=',$periodo.'-15')
                         ->where('estatus_final','ACEPTADA - Facturada')
@@ -1148,6 +1222,12 @@ class DashboardsController extends Controller
                                 ->whereRaw('lpad(created_at,7,0)=?',$periodo)
                                 ->get();
         }
+        if($origen=="D")
+        {
+            $detalles=Ordenes::select(DB::raw('distinct region as llave, region as value'))
+                                ->whereRaw('lpad(created_at,7,0)=?',$periodo)
+                                ->get();
+        }
 
 
         return view('dashboard_resumen_periodo',['periodo'=>$periodo,
@@ -1190,5 +1270,151 @@ class DashboardsController extends Controller
                                                     'detalles'=>$detalles
                                                 ]);
 
+    }
+    public function dashboard_resumen_efectividad(Request $request)
+    {
+        $periodo=$request->periodo;
+        session()->put('periodo', $periodo);
+        $campo_universo='';
+        $key_universo='';
+        $titulo='';
+        $origen='';
+        $campos_group="";
+        $nav_origen="PRINCIPAL";
+        if(isset($request->tipo))
+        {
+            $nav_origen="DRILLDOWN";
+            if($request->tipo=="E")
+            {
+                $campo_universo='empleado';
+                $key_universo=$request->key;
+                $titulo=$request->value;
+                $origen='E';
+                
+            }
+            if($request->tipo=="G")
+            {
+                $campo_universo='udn';
+                $key_universo=$request->key;
+                $titulo=$request->value;
+                $origen='G';
+                $campos_group='empleado,nombre';
+                $campos_vista="empleado as llave,nombre as value";
+            }
+            if($request->tipo=="R")
+            {
+                $campo_universo='region';
+                $key_universo=$request->key;
+                $titulo=$request->value;
+                $origen='R';
+                $campos_group='udn,pdv';
+                $campos_vista="udn as llave,pdv as value";
+            }
+        }
+        else{
+            if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
+            {
+                $campo_universo='empleado';
+                $key_universo=Auth::user()->empleado;
+                $titulo=Auth::user()->name;
+                $origen='E';
+            }
+            if(Auth::user()->puesto=='Gerente')
+            {
+                $campo_universo='udn';
+                $key_universo=Auth::user()->udn;
+                $titulo=Auth::user()->pdv;
+                $origen='G';
+                $campos_group='empleado,nombre';
+                $campos_vista="empleado as llave,nombre as value";
+            }
+            if(Auth::user()->puesto=='Regional')
+            {
+                $campo_universo='region';
+                $key_universo=Auth::user()->pdv;
+                $titulo=Auth::user()->region;
+                $origen='R';
+                $campos_group='udn,pdv';
+                $campos_vista="udn as llave,pdv as value";
+            }
+            if(Auth::user()->puesto=='Director')
+            {
+                $campo_universo=0;
+                $key_universo=0;
+                $titulo='Sucursales';
+                $origen='D';
+                $campos_group='region';
+                $campos_vista="region as llave,region as value";
+            }
+        }
+
+        $flujo=Interaccion::select(DB::raw('count(*) as flujo'))
+                          ->whereRaw(''.$campo_universo.'=?',$key_universo)
+                          ->whereRaw('lpad(created_at,7,0)=?',$periodo)
+                          ->get()
+                          ->first();
+        $efectivas=Ordenes::select(DB::raw('origen,count(*) as efectivas'))
+                          ->whereRaw(''.$campo_universo.'=?',$key_universo)
+                          ->where('estatus_final','ACEPTADA - Facturada')
+                          ->whereRaw('lpad(created_at,7,0)=?',$periodo)
+                          ->groupBy('origen')
+                          ->get();
+
+        $demanda=GeneracionDemanda::select(DB::raw('sum(sms) as sms,sum(sms_individual) as sms_individual,sum(llamadas) as llamadas,sum(rs) as rs'))
+                          ->whereRaw(''.$campo_universo.'=?',$key_universo)
+                          ->whereRaw('lpad(dia_trabajo,7,0)=?',$periodo)
+                          ->get()
+                          ->first();
+
+        $e_tienda=0;
+        $e_llamada=0;
+        $e_sms=0;
+        $e_rs=0;
+        foreach($efectivas as $origen_reg)
+        {
+            if($origen_reg->origen=='Llamada'){$e_llamada=$origen_reg->efectivas;}
+            if($origen_reg->origen=='Redes Sociales'){$e_rs=$origen_reg->efectivas;}
+            if($origen_reg->origen=='SMS'){$e_sms=$origen_reg->efectivas;}
+            if($origen_reg->origen=='Tienda'){$e_tienda=$origen_reg->efectivas;}
+        }
+
+        $llamada=is_null($demanda->llamadas)?0:$demanda->llamadas;
+        $sms=is_null($demanda->sms)?0:$demanda->sms;
+        $sms_individual=is_null($demanda->sms_individual)?0:$demanda->sms_individual;
+        $sms_total=$sms+$sms_individual;
+        $rs=is_null($demanda->rs)?0:$demanda->rs;
+
+        $detalles=[]; 
+        if($origen=='G'||$origen=='R'||$origen=='D')
+        {
+            $sql_detalles="select ".$campos_vista.",flujo,facturadas_tda,demanda,facturadas_dem from (select ".$campos_group.",sum(flujo) as flujo,sum(facturadas_tda) as facturadas_tda,sum(demanda) as demanda,sum(facturadas_dem) as facturadas_dem from (";
+            $sql_detalles=$sql_detalles."select ".$campos_group.",count(*) as flujo,0 as facturadas_tda,0 as demanda,0 as facturadas_dem from interaccions as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' group by ".$campos_group;
+            $sql_detalles=$sql_detalles." UNION ";
+            $sql_detalles=$sql_detalles."select ".$campos_group.",0 as flujo,count(*) as facturadas_tda,0 as demanda,0 as facturadas_dem from ordenes as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and estatus_final like '%ACEPTADA - F%' and origen='Tienda' group by ".$campos_group;
+            $sql_detalles=$sql_detalles." UNION ";
+            $sql_detalles=$sql_detalles."select ".$campos_group.",0 as flujo,0 as facturadas_tda,sum(llamadas+sms+sms_individual+rs) as demanda,0 as facturadas_dem from generacion_demandas as a where lpad(dia_trabajo,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' group by ".$campos_group;
+            $sql_detalles=$sql_detalles." UNION ";
+            $sql_detalles=$sql_detalles."select ".$campos_group.",0 as flujo,0 as facturadas_tda,0 as demanda,count(*) as facturadas_dem from ordenes as a where lpad(created_at,7,0)='".$periodo."' and ".$campo_universo."='".$key_universo."' and estatus_final like '%ACEPTADA - F%' and origen!='Tienda' group by ".$campos_group;
+            $sql_detalles=$sql_detalles.") as a group by ".$campos_group.") as a";
+            //return($origen);
+            $detalles=DB::select(DB::raw(
+                $sql_detalles
+            ));
+        }
+        
+        return(view('dashboard_resumen_efectividad',['periodo'=>$periodo,
+                                                     'origen'=>$origen,
+                                                     'nav_origen'=>$nav_origen,
+                                                     'titulo'=>$titulo,
+                                                     'flujo'=>$flujo->flujo,
+                                                     'e_tienda'=>$e_tienda,
+                                                     'e_llamada'=>$e_llamada,
+                                                     'e_sms'=>$e_sms,
+                                                     'e_rs'=>$e_rs,
+                                                     'llamada'=>$llamada,
+                                                     'rs'=>$rs,
+                                                     'sms'=>$sms_total,
+                                                     'detalles'=>$detalles,
+                                                    ]));
     }
 }

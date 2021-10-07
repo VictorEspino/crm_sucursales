@@ -4,7 +4,7 @@
     </x-slot>
     <div class="flex flex-col w-full bg-white text-gray-700 shadow-lg rounded-lg">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
-            <div class="w-full text-lg font-semibold">Resumen periodo nada - {{$periodo}}</div>
+            <div class="w-full text-lg font-semibold">Resumen periodo - {{$periodo}}</div>
         @if($nav_origen=='DRILLDOWN')
             <div class="w-full text-sm text-red-700 font-bold"><a href="javascript: window.history.back()"><< Regresar</a></div>
         @endif
@@ -270,11 +270,11 @@
                 <br>Tiempo:{{number_format($tiempo_productivo_q2,0)}}
             </div>
         </div>
-        @if($origen=="G" || $origen=="R")
+        @if($origen=="G" || $origen=="R" || $origen=="D")
         <div class="w-full flex flex-col pb-4">
             <div class="w-full p-4 bg-gray-200 text-gray-700 text-xl font-semibold border-b ">Detalles de : </div>
             @foreach($detalles as $detalle)
-            <div class="w-full text-base font-semibold flex justify-center"><a href="/dashboard_resumen_periodo/{{$periodo}}/{{$origen=='G'?'E':'G'}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->value}}</a></div>
+            <div class="w-full text-base font-semibold flex justify-center"><a href="/dashboard_resumen_periodo/{{$periodo}}/{{($origen=="G"?'E':($origen=="R"?"G":"R"))}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->value}}</a></div>
             @endforeach
         </div>
         @endif

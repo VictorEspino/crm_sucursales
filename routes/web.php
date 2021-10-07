@@ -76,6 +76,9 @@ Route::get('/dashboard_productividad/{periodo}/{tipo}/{key}/{value}', [Dashboard
 Route::get('/dashboard_resumen_periodo/{periodo}', [DashboardsController::class,'dashboard_resumen_periodo'])->middleware('auth')->name('dashboard_resumen_periodo');
 Route::get('/dashboard_resumen_periodo/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_resumen_periodo'])->middleware('auth')->name('dashboard_resumen_periodo');
 
+Route::get('/dashboard_resumen_efectividad/{periodo}', [DashboardsController::class,'dashboard_resumen_efectividad'])->middleware('auth')->name('dashboard_resumen_efectividad');
+Route::get('/dashboard_resumen_efectividad/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_resumen_efectividad'])->middleware('auth')->name('dashboard_resumen_efectividad');
+
 Route::get('/export_interaccion/{periodo}', [ExportController::class,'export_interaccion'])->middleware('auth');
 Route::get('/export_orden/{periodo}', [ExportController::class,'export_orden'])->middleware('auth');
 
