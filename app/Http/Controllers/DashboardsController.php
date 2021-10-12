@@ -1030,7 +1030,10 @@ class DashboardsController extends Controller
         if($origen=="E")
         {
             $usuario=User::where('empleado',$key_universo)->get()->first();
-            $objetivos=Objetivo::select(DB::raw('udn,sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
+            $objetivos=Objetivo::select(DB::raw('udn,sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,
+                                                sum(ac_q1) as ac_q1,sum(as_q1) as as_q1,sum(rc_q1) as rc_q1,sum(rs_q1) as rs_q1,
+                                                sum(ac_q2) as ac_q2,sum(as_q2) as as_q2,sum(rc_q2) as rc_q2,sum(rs_q2) as rs_q2,
+                                                sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
                             ->where('udn',$usuario->udn)
                             ->where('periodo',$periodo)
                             ->groupBy('udn')
@@ -1043,13 +1046,24 @@ class DashboardsController extends Controller
                 $as=$objetivo->asi/$ejecutivos_sucursal;
                 $rc=$objetivo->rc/$ejecutivos_sucursal;
                 $rs=$objetivo->rs/$ejecutivos_sucursal;
+                $ac_q1=$objetivo->ac_q1/$ejecutivos_sucursal;
+                $as_q1=$objetivo->as_q1/$ejecutivos_sucursal;
+                $rc_q1=$objetivo->rc_q1/$ejecutivos_sucursal;
+                $rs_q1=$objetivo->rs_q1/$ejecutivos_sucursal;
+                $ac_q2=$objetivo->ac_q2/$ejecutivos_sucursal;
+                $as_q2=$objetivo->as_q2/$ejecutivos_sucursal;
+                $rc_q2=$objetivo->rc_q2/$ejecutivos_sucursal;
+                $rs_q2=$objetivo->rs_q2/$ejecutivos_sucursal;
                 $min_diario=$objetivo->min_diario;
                 $ejecutivos=1;
             }
         }
         else
         {
-            $objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
+            $objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,
+                                                sum(ac_q1) as ac_q1,sum(as_q1) as as_q1,sum(rc_q1) as rc_q1,sum(rs_q1) as rs_q1,
+                                                sum(ac_q2) as ac_q2,sum(as_q2) as as_q2,sum(rc_q2) as rc_q2,sum(rs_q2) as rs_q2,
+                                                sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
                             ->whereRaw(''.$campo_universo.'=?',$key_universo)
                             ->where('periodo',$periodo)
                             ->groupBy($campo_universo)
@@ -1061,6 +1075,14 @@ class DashboardsController extends Controller
                 $as=$objetivo->asi;
                 $rc=$objetivo->rc;
                 $rs=$objetivo->rs;
+                $ac_q1=$objetivo->ac_q1;
+                $as_q1=$objetivo->as_q1;
+                $rc_q1=$objetivo->rc_q1;
+                $rs_q1=$objetivo->rs_q1;
+                $ac_q2=$objetivo->ac_q2;
+                $as_q2=$objetivo->as_q2;
+                $rc_q2=$objetivo->rc_q2;
+                $rs_q2=$objetivo->rs_q2;
                 $min_diario=$objetivo->min_diario;
                 $ejecutivos=$objetivo->ejecutivos;
             }
@@ -1238,6 +1260,14 @@ class DashboardsController extends Controller
                                                     'as'=>$as,
                                                     'rc'=>$rc,
                                                     'rs'=>$rs,
+                                                    'ac_q1'=>$ac_q1,
+                                                    'as_q1'=>$as_q1,
+                                                    'rc_q1'=>$rc_q1,
+                                                    'rs_q1'=>$rs_q1,
+                                                    'ac_q2'=>$ac_q2,
+                                                    'as_q2'=>$as_q2,
+                                                    'rc_q2'=>$rc_q2,
+                                                    'rs_q2'=>$rs_q2,
                                                     'av_ac'=>$av_ac,
                                                     'av_as'=>$av_as,
                                                     'av_rc'=>$av_rc,

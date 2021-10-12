@@ -48,32 +48,94 @@
                     @enderror                    
                 </div>
             </div>
-            <div class="w-full pt-2"><span class="text-sm font-bold">Cuota Mensual:</span></div>
+            <div class="w-full pt-2"><span class="text-sm font-bold">Cuota Primera Quincena:</span></div>
             <div class="w-full flex flex-row space-x-2">
                 <div class="w-1/4">
-                    <span class="text-xs">Activaciones CON equipo</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_con" id="a_con" value="{{old('a_con')}}">
+                    <span class="text-xs">Activaciones CON equipo Q1</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_con_q1" id="a_con_q1" value="{{old('a_con_q1')}}" onChange="update_cuotas()">
+                    @error('a_con_q1')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                <div class="w-1/4">
+                    <span class="text-xs">Activaciones SIN equipo Q1</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_sin_q1" id="a_sin_q1" value="{{old('a_sin_q1')}}" onChange="update_cuotas()">
+                    @error('a_sin_q1')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                <div class="w-1/4">
+                    <span class="text-xs">Renovaciones CON equipo Q1</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_con_q1" id="r_con_q1" value="{{old('r_con_q1')}}" onChange="update_cuotas()">
+                    @error('r_con_q1')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                <div class="w-1/4">
+                    <span class="text-xs">Renovaciones SIN equipo Q1</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_sin_q1" id="r_sin_q1" value="{{old('r_sin_q1')}}" onChange="update_cuotas()">
+                    @error('a_sin_q1')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>                
+            </div>
+            <div class="w-full pt-2"><span class="text-sm font-bold">Cuota Segunda Quincena:</span></div>
+            <div class="w-full flex flex-row space-x-2">
+                <div class="w-1/4">
+                    <span class="text-xs">Activaciones CON equipo Q2</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_con_q2" id="a_con_q2" value="{{old('a_con_q2')}}" onChange="update_cuotas()">
+                    @error('a_con_q2')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                <div class="w-1/4">
+                    <span class="text-xs">Activaciones SIN equipo Q2</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_sin_q2" id="a_sin_q2" value="{{old('a_sin_q2')}}" onChange="update_cuotas()">
+                    @error('a_sin_q2')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                <div class="w-1/4">
+                    <span class="text-xs">Renovaciones CON equipo Q2</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_con_q2" id="r_con_q2" value="{{old('r_con_q2')}}" onChange="update_cuotas()">
+                    @error('r_con_q2')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>
+                <div class="w-1/4">
+                    <span class="text-xs">Renovaciones SIN equipo Q2</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_sin_q2" id="r_sin_q2" value="{{old('r_sin_q2')}}" onChange="update_cuotas()">
+                    @error('a_sin_q2')
+                      <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
+                    @enderror                    
+                </div>                
+            </div>
+            <div class="w-full pt-2"><span class="text-sm font-bold text-red-700">Cuota Mensual:</span></div>
+            <div class="w-full flex flex-row space-x-2">
+                <div class="w-1/4">
+                    <span class="text-xs">Activaciones CON equipo Mensual</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_con" id="a_con" value="{{old('a_con')}}" readonly>
                     @error('a_con')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
                 </div>
                 <div class="w-1/4">
-                    <span class="text-xs">Activaciones SIN equipo</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_sin" id="a_sin" value="{{old('a_sin')}}">
+                    <span class="text-xs">Activaciones SIN equipo Mensual</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="a_sin" id="a_sin" value="{{old('a_sin')}}" readonly>
                     @error('a_sin')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
                 </div>
                 <div class="w-1/4">
-                    <span class="text-xs">Renovaciones CON equipo</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_con" id="r_con" value="{{old('r_con')}}">
+                    <span class="text-xs">Renovaciones CON equipo Mensual</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_con" id="r_con" value="{{old('r_con')}}" readonly>
                     @error('r_con')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
                 </div>
                 <div class="w-1/4">
-                    <span class="text-xs">Renovaciones SIN equipo</span><br>
-                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_sin" id="r_sin" value="{{old('r_sin')}}">
+                    <span class="text-xs">Renovaciones SIN equipo Mensual</span><br>
+                    <input class="w-full rounded p-1 border border-gray-300" type="text" name="r_sin" id="r_sin" value="{{old('r_sin')}}" readonly>
                     @error('a_sin')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>
                     @enderror                    
@@ -106,6 +168,21 @@
         </form>
     </div>
 <script>
+function update_cuotas()
+{
+    ac_1=parseInt(document.getElementById("a_con_q1").value);
+    as_1=parseInt(document.getElementById("a_sin_q1").value);
+    rc_1=parseInt(document.getElementById("r_con_q1").value);
+    rs_1=parseInt(document.getElementById("r_sin_q1").value);
+    ac_2=parseInt(document.getElementById("a_con_q2").value);
+    as_2=parseInt(document.getElementById("a_sin_q2").value);
+    rc_2=parseInt(document.getElementById("r_con_q2").value);
+    rs_2=parseInt(document.getElementById("r_sin_q2").value);
+    document.getElementById("a_con").value=ac_1+ac_2;
+    document.getElementById("a_sin").value=as_1+as_2;
+    document.getElementById("r_con").value=rc_1+rc_2;
+    document.getElementById("r_sin").value=rs_1+rs_2;
+}
 function buscar_objetivo() {
     
     var periodo=document.getElementById("periodo").value;
@@ -128,6 +205,17 @@ function buscar_objetivo() {
                 document.getElementById("a_sin").value="";
                 document.getElementById("r_con").value="";
                 document.getElementById("r_sin").value="";
+
+                document.getElementById("a_con_q1").value="";
+                document.getElementById("a_sin_q1").value="";
+                document.getElementById("r_con_q1").value="";
+                document.getElementById("r_sin_q1").value="";
+
+                document.getElementById("a_con_q2").value="";
+                document.getElementById("a_sin_q2").value="";
+                document.getElementById("r_con_q2").value="";
+                document.getElementById("r_sin_q2").value="";
+
                 document.getElementById("ejecutivos").value="";
                 document.getElementById("min_diario").value="";
 
@@ -135,6 +223,18 @@ function buscar_objetivo() {
                 document.getElementById("a_sin").value=respuesta.asi;
                 document.getElementById("r_con").value=respuesta.rc;
                 document.getElementById("r_sin").value=respuesta.rs;
+
+                document.getElementById("a_con_q1").value=respuesta.ac_q1;
+                document.getElementById("a_sin_q1").value=respuesta.as_q1;
+                document.getElementById("r_con_q1").value=respuesta.rc_q1;
+                document.getElementById("r_sin_q1").value=respuesta.rs_q1;
+
+                document.getElementById("a_con_q2").value=respuesta.ac_q2;
+                document.getElementById("a_sin_q2").value=respuesta.as_q2;
+                document.getElementById("r_con_q2").value=respuesta.rc_q2;
+                document.getElementById("r_sin_q2").value=respuesta.rs_q2;
+
+
                 document.getElementById("ejecutivos").value=respuesta.ejecutivos;
                 document.getElementById("min_diario").value=respuesta.min_diario;
 
@@ -146,6 +246,17 @@ function buscar_objetivo() {
                 document.getElementById("a_sin").value="";
                 document.getElementById("r_con").value="";
                 document.getElementById("r_sin").value="";
+
+                document.getElementById("a_con_q1").value="";
+                document.getElementById("a_sin_q1").value="";
+                document.getElementById("r_con_q1").value="";
+                document.getElementById("r_sin_q1").value="";
+
+                document.getElementById("a_con_q2").value="";
+                document.getElementById("a_sin_q2").value="";
+                document.getElementById("r_con_q2").value="";
+                document.getElementById("r_sin_q2").value="";
+
                 document.getElementById("ejecutivos").value="";
                 document.getElementById("min_diario").value="";
             }

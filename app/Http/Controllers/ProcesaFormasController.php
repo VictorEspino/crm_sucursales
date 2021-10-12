@@ -571,6 +571,14 @@ class ProcesaFormasController extends Controller
         $request->validate([
             'periodo' => 'required',
             'sucursal' => 'required',
+            'a_con_q1'=>'required|numeric',
+            'a_sin_q1'=>'required|numeric',
+            'r_con_q1' => 'required|numeric',
+            'r_sin_q1' => 'required|numeric',
+            'a_con_q2'=>'required|numeric',
+            'a_sin_q2'=>'required|numeric',
+            'r_con_q2' => 'required|numeric',
+            'r_sin_q2' => 'required|numeric',
             'a_con'=>'required|numeric',
             'a_sin'=>'required|numeric',
             'r_con' => 'required|numeric',
@@ -584,6 +592,14 @@ class ProcesaFormasController extends Controller
                   'asi' => $request->a_sin,
                   'rc' => $request->r_con,
                   'rs' => $request->r_sin,
+                  'ac_q1' => $request->a_con_q1,
+                  'as_q1' => $request->a_sin_q1,
+                  'rc_q1' => $request->r_con_q1,
+                  'rs_q1' => $request->r_sin_q1,
+                  'ac_q2' => $request->a_con_q2,
+                  'as_q2' => $request->a_sin_q2,
+                  'rc_q2' => $request->r_con_q2,
+                  'rs_q2' => $request->r_sin_q2,
                   'ejecutivos' => $request->ejecutivos,
                   'min_diario' => $request->min_diario,
                 ]);
@@ -595,6 +611,14 @@ class ProcesaFormasController extends Controller
             $registro->asi=$request->a_sin;
             $registro->rc=$request->r_con;
             $registro->rs=$request->r_sin;
+            $registro->ac_q1=$request->a_con_q1;
+            $registro->as_q1=$request->a_sin_q1;
+            $registro->rc_q1=$request->r_con_q1;
+            $registro->rs_q1=$request->r_sin_q1;
+            $registro->ac_q2=$request->a_con_q2;
+            $registro->as_q2=$request->a_sin_q2;
+            $registro->rc_q2=$request->r_con_q2;
+            $registro->rs_q2=$request->r_sin_q2;
             $registro->ejecutivos=$request->ejecutivos;
             $registro->min_diario=$request->min_diario;
             $registro->periodo=$request->periodo;

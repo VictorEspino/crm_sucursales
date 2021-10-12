@@ -38,6 +38,7 @@ class ProcesaSeguimientoController extends Controller
             $registros=Funnel::where($campo_universo,$key_universo)
                                 ->where('cliente','like','%'.$_GET["query"].'%')
                                 ->where('estatus','!=','Orden')
+                                ->where('estatus','!=','Finalizar Seguimiento')
                                 ->orderBy('created_at','desc')
                                 ->paginate(10);
             $registros->appends($request->all());
@@ -47,6 +48,7 @@ class ProcesaSeguimientoController extends Controller
         {
             $registros=Funnel::where($campo_universo,$key_universo)
                                 ->where('estatus','!=','Orden')
+                                ->where('estatus','!=','Finalizar Seguimiento')
                                 ->orderBy('created_at','desc')                                
                                 ->paginate(10);
             return(view('seguimiento_funnel',['registros'=>$registros,'query'=>'']));
@@ -74,8 +76,9 @@ class ProcesaSeguimientoController extends Controller
         }
 
         $registros=Funnel::where($campo_universo,$key_universo)
-                            ->select('id',DB::raw('cliente as title, fecha_sig_contacto as start'))
+                            ->select('id',DB::raw('cliente as title, fecha_sig_contacto as start,CASE WHEN fecha_sig_contacto<date(now()) THEN "#FF0000" ELSE "#0073e6" END as backgroundColor'))
                             ->where('estatus','!=','Orden')
+                            ->where('estatus','!=','Finalizar Seguimiento')
                             ->orderBy('created_at','desc')
                             ->get();                      
                             //return($registros);         

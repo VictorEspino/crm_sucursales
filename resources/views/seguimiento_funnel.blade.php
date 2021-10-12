@@ -131,6 +131,7 @@
                                     <option value="Registro nuevo">Registro nuevo</option>
                                     <option value="Seguimiento">Seguimiento</option>
                                     <option value="Orden">Orden</option>
+                                    <option value="Finalizar Seguimiento">Finalizar Seguimiento</option>
                                 </select>
                             </div>
                             <div class="w-1/2">
