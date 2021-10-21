@@ -5,6 +5,7 @@ use App\Http\Controllers\ProcesaFormasController;
 use App\Http\Controllers\ProcesaSeguimientoController;
 use App\Http\Controllers\DashboardsController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\ExcelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,3 +96,6 @@ Route::post('/objetivo_update', [ProcesaFormasController::class,'objetivo_update
 Route::get('/objetivo_consulta/{periodo}/{udn}', [ProcesaFormasController::class,'objetivo_consulta'])->middleware('auth')->name('objetivo_consulta');
 
 Route::get('/plantilla_sucursal', function () {return view('plantilla_sucursal');})->middleware('auth')->name('plantilla_sucursal');
+
+Route::get('/erp_import', function () {return view('erp_import');})->middleware('auth')->name('erp_import');
+Route::post('/erp_import', [ExcelController::class,'erp_import'])->middleware('auth')->name('erp_import');

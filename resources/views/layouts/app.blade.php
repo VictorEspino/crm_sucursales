@@ -150,6 +150,17 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                                 </a>
                             </li>
                             <li class="w-full h-full py-3 px-2 border-b border-light-border bg-blue-200">
+                                Rentabilidad
+                            </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('erp_import')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('erp_import') }}"
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-user float-left mx-2"></i>
+                                      Carga archivo ERP
+                                    <span><i class="fa fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border bg-blue-200">
                                 Plantilla
                             </li>
                             <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('plantilla_nuevo')?'bg-gray-100':'br-gray-800'}}">
