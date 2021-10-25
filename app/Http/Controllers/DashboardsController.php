@@ -14,6 +14,9 @@ use App\Models\Incidencia;
 use App\Models\User;
 use App\Models\Sucursal;
 use App\Models\EstaticoDias;
+use App\Models\RentabilidadPeriodosGastos;
+use App\Models\RentabilidadGastos;
+use App\Models\ErpTransaccion;
 
 class DashboardsController extends Controller
 {
@@ -1446,5 +1449,256 @@ class DashboardsController extends Controller
                                                      'sms'=>$sms_total,
                                                      'detalles'=>$detalles,
                                                     ]));
+    }
+    public function forma_carga_gastos(Request $request)
+    {
+        $periodos=RentabilidadPeriodosGastos::withCount('detalles')->orderBy('id','asc')->get();
+        $ultimo_conocido=0;
+        $periodo_carga_desc="";
+        $periido_carga_id=0;
+        foreach($periodos as $periodo)
+        {
+            if($periodo->detalles_count!=0)
+            {
+                $ultimo_conocido=$periodo->id;
+            }
+            else 
+            {
+                $periodo_carga_desc=$periodo->descripcion;
+                $periodo_carga_id=$periodo->id;
+                break;
+            }
+        }
+        $ultimo_conocido_detalles=RentabilidadGastos::where('periodo',$ultimo_conocido);
+        if(Auth::user()->puesto!="Director" && Auth::user()->puesto!="Regional")
+        {
+            $ultimo_conocido_detalles=$ultimo_conocido_detalles->where('udn',Auth::user()->udn);
+        }
+        $ultimo_conocido_detalles=$ultimo_conocido_detalles->get();
+
+        return(view('rentabilidad_gastos',['ultimo_conocido_detalles'=>$ultimo_conocido_detalles,
+                                           'periodo_carga_desc'=>$periodo_carga_desc,
+                                           'periodo_carga_id'=>$periodo_carga_id
+                                        ]));
+    }
+    public function dashboard_rentabilidad(Request $request)
+    {
+        $periodo=$request->periodo;//es el periodo del dashboard
+        session()->put('periodo', $periodo);
+        $nav_origen="PRINCIPAL";
+        $sucursales=Sucursal::select('udn','pdv')->get();
+        $sucursales=$sucursales->pluck('pdv','udn');
+        if(isset($request->tipo))
+        {
+            $nav_origen="DRILLDOWN";
+            if($request->tipo=="E")
+            {
+                $origen='E';   
+            }
+            if($request->tipo=="G")
+            {
+                $origen='G';
+                $filtro=$request->value;
+            }
+            if($request->tipo=="R")
+            {
+                $origen='R';
+                $filtro=$request->value;
+            }
+        }
+        else{
+            if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
+            {
+                $origen='E';
+            }
+            if(Auth::user()->puesto=='Gerente')
+            {
+                $origen='G';
+                $filtro=Auth::user()->udn;
+            }
+            if(Auth::user()->puesto=='Regional')
+            {
+                $origen='R';
+                $filtro=Auth::user()->region;
+            }
+            if(Auth::user()->puesto=='Director')
+            {
+                $origen='D';
+                $filtro='';
+            }
+        }
+        $consistencia=false;
+        //CON ESTO OBTIENE EL PERIODO QUE LE TOCA
+        $periodo_gastos=RentabilidadPeriodosGastos::withCount('detalles')
+                                        ->where('inicio_vigencia','<=',$periodo.'-01')
+                                        ->where('fin_vigencia','>=',$periodo.'-01')
+                                        ->get()
+                                        ->first();
+        $id_gastos=$periodo_gastos->id;
+        $titulo_gastos=$periodo_gastos->descripcion;
+        //VERIFICA QUE YA ESTAN CARGADOS SUS PARAMETROS
+        if($periodo_gastos->detailles_count==0)
+        {
+            $ultimo_conocido=RentabilidadGastos::select(DB::raw('max(periodo) as id'))
+                                                ->get()
+                                                ->first();
+            $periodo_alterno=RentabilidadPeriodosGastos::find($ultimo_conocido->id);
+            $id_gastos=$ultimo_conocido->id;
+            $titulo_gastos=$periodo_alterno->descripcion;
+            $consistencia=false;
+        }
+        $titulo_principal='';
+        $gastos_fijos=0;
+        $gastos_indirectos=0;
+        $ingresos=0;
+        $costos_venta=0;
+        $gastos=RentabilidadGastos::where('periodo',$id_gastos)
+                        ->select(DB::raw('sum(gastos_fijos) as g_f,sum(gastos_indirectos) as g_i'));
+        $erp=ErpTransaccion::whereRaw('lpad(fecha,7,0)=?',$periodo)
+                        ->select(DB::raw('sum(ingreso) as ingreso,sum(costo_venta) as c_v'));
+        $activaciones=[];
+        $renovaciones=[];
+        $aep=[];
+        $rep=[];
+        $add_ons=[];
+        $seguros=[];
+        $detalles=[];
+        if($origen=="D")
+        {
+            $titulo_principal='Sucursales';
+            $gastos=$gastos->get()->first();
+            $erp=$erp->get()->first();   
+            $activaciones=DB::select(DB::raw($this->getSQL($origen,'','TRADICIONAL','ACT',$periodo)));
+            $renovaciones=DB::select(DB::raw($this->getSQL($origen,'','TRADICIONAL','REN',$periodo)));
+            $aep=DB::select(DB::raw($this->getSQL($origen,'','TRADICIONAL','AEP',$periodo)));
+            $rep=DB::select(DB::raw($this->getSQL($origen,'','TRADICIONAL','REP',$periodo)));
+            $add_ons=DB::select(DB::raw($this->getSQL($origen,'','ADDON','ADD',$periodo)));
+            $seguros=DB::select(DB::raw($this->getSQL($origen,'','SEGUROS','SEG',$periodo)));
+            $detalles=DB::select(DB::raw($this->getSQL_detalles($origen,'',$id_gastos,$periodo)));
+        }
+        if($origen=="R")
+        {
+            $titulo_principal='REGION '.$filtro;
+            $gastos=$gastos->where('region',$filtro)->get()->first();
+            $erp=$erp->where('region',$filtro)->get()->first(); 
+            $activaciones=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','ACT',$periodo)));
+            $renovaciones=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','REN',$periodo)));
+            $aep=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','AEP',$periodo)));
+            $rep=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','REP',$periodo)));
+            $add_ons=DB::select(DB::raw($this->getSQL($origen,$filtro,'ADDON','ADD',$periodo)));
+            $seguros=DB::select(DB::raw($this->getSQL($origen,$filtro,'SEGUROS','SEG',$periodo)));           
+            $detalles=DB::select(DB::raw($this->getSQL_detalles($origen,$filtro,$id_gastos,$periodo)));
+        }
+        if($origen=="G" || $origen=="E")
+        {
+            $titulo_principal=''.$sucursales[$filtro];
+            $gastos=$gastos->where('udn',$filtro)->get()->first();
+            $erp=$erp->where('udn',$filtro)->get()->first();   
+            $activaciones=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','ACT',$periodo)));
+            $renovaciones=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','REN',$periodo)));
+            $aep=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','AEP',$periodo)));
+            $rep=DB::select(DB::raw($this->getSQL($origen,$filtro,'TRADICIONAL','REP',$periodo)));
+            $add_ons=DB::select(DB::raw($this->getSQL($origen,$filtro,'ADDON','ADD',$periodo)));
+            $seguros=DB::select(DB::raw($this->getSQL($origen,$filtro,'SEGUROS','SEG',$periodo)));
+            $detalles=DB::select(DB::raw($this->getSQL_detalles($origen,$filtro,$id_gastos,$periodo)));
+        }
+        $ingresos=$erp->ingreso;
+        $costos_venta=$erp->c_v;
+        $gastos_fijos=$gastos->g_f;
+        $gastos_indirectos=$gastos->g_i;
+        $sum_gastos=$costos_venta+$gastos_fijos+$gastos_indirectos;
+        $porc_rentabilidad=$sum_gastos>0?100*$ingresos/$sum_gastos:0;
+
+        /*
+        $sql_sucursales="
+            select distinct udn from (
+                SELECT distinct udn FROM erp_transaccions WHERE lpad(fecha,7,0)='".$periodo."'
+                UNION
+                SELECT udn FROM rentabilidad_gastos WHERE periodo=".$id_gastos."
+                ) as a
+                        ";
+        $sucursales=collect(DB::select(DB::raw($sql_sucursales)))->pluck('udn');
+
+        return($sucursales);
+                */
+                $consistencia=true;
+        $brackets=DB::select(DB::raw('select * from brackets where tipo="TRADICIONAL"'));
+        
+        return(view('dashboard_rentabilidad',[
+                                                'nav_origen'=>$nav_origen,
+                                                'origen'=>$origen,
+                                                'periodo'=>$periodo,
+                                                'consistencia'=>$consistencia,
+                                                'titulo_principal'=>$titulo_principal,
+                                                'gastos_fijos'=>$gastos_fijos,
+                                                'gastos_indirectos'=>$gastos_indirectos,
+                                                'ingresos'=>$ingresos,
+                                                'costos_venta'=>$costos_venta,
+                                                'titulo_gastos'=>$titulo_gastos,
+                                                'sum_gastos'=>$sum_gastos,
+                                                'porc_rentabilidad'=>$porc_rentabilidad,
+                                                'activaciones'=>$activaciones,
+                                                'renovaciones'=>$renovaciones,
+                                                'aep'=>$aep,
+                                                'rep'=>$rep,
+                                                'add_ons'=>$add_ons,
+                                                'seguros'=>$seguros,
+                                                'bracket_desde'=>collect($brackets)->pluck('desde','bracket'),
+                                                'bracket_hasta'=>collect($brackets)->pluck('hasta','bracket'),
+                                                'detalles'=>$detalles,
+                                                'sucursales'=>$sucursales
+                                            ]));
+    }
+    private function getSQL($origen,$filtro,$tipo,$tipo_consulta,$periodo)
+    {
+        $filtro_adicional='';
+        if($origen=="R")
+        {
+            $filtro_adicional=" and region='".$filtro."'";
+        }
+        if($origen=="E" || $origen=="G")
+        {
+            $filtro_adicional=" and udn='".$filtro."'";
+        }
+        $sql="select bracket, sum(n) as n,sum(ingreso) as ingreso,sum(c_v) as c_v from ( 
+            select bracket,0 as n,0 as ingreso,0 as c_v from brackets where tipo='".$tipo."'
+            UNION
+            select bracket,count(*),sum(ingreso) as ingreso,sum(costo_venta) c_v 
+            from erp_transaccions 
+            where 
+            lpad(fecha,7,0)='".$periodo."' and 
+            tipo_estandar='".$tipo_consulta."' ".$filtro_adicional." 
+            group by bracket) as a 
+            group by bracket";
+        return($sql);
+    }
+    private function getSQL_detalles($origen,$filtro,$periodo_gastos,$periodo_transacciones)
+    {
+        $filtro_adicional='';
+        $llave='';
+        if($origen=="D")
+        {
+            $llave='region';
+        }
+        if($origen=="R")
+        {
+            $llave='udn';
+            $filtro_adicional=" and region='".$filtro."'";
+        }
+        if($origen=="E" || $origen=="G")
+        {
+            $llave='udn';
+            $filtro_adicional=" and udn='".$filtro."'";
+        }
+        $sql="
+            select * from (
+            select ".$llave." as llave,sum(gastos_fijos) as gastos_fijos,sum(gastos_indirectos) as gastos_indirectos,sum(ingresos) as ingresos, sum(c_v) as c_v,(100*sum(ingresos)/sum(gastos_fijos+gastos_indirectos+c_v)) as rentabilidad from(
+            select ".$llave.",gastos_fijos,gastos_indirectos,0 as ingresos, 0 as c_v from rentabilidad_gastos where periodo=".$periodo_gastos."".$filtro_adicional."  
+            UNION
+            select ".$llave." as llave,0 as gastos_fijos,0 as gastos_indirectos,sum(ingreso) as ingresos, sum(costo_venta) as c_v from erp_transaccions where lpad(fecha,7,0)='".$periodo_transacciones."'".$filtro_adicional." group by udn,region
+                ) as a group by a.".$llave."
+                )as a order by rentabilidad desc;
+             ";
+        return($sql);
     }
 }

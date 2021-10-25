@@ -20,6 +20,8 @@ class ErpTransaccion extends Model
             'importe',
             'ingreso',
             'costo_venta',
+            'bracket',
+            'tipo_estandar',
             'descripcion',
             'cliente',
             'dn',

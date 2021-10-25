@@ -1,17 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
-            {{ __('Importar ERP') }}
+            {{ __('Rentabilidad Gastos') }}
     </x-slot>
 
     <div class="flex flex-col w-full bg-white text-gray-700 shadow-lg rounded-lg">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
-            <div class="w-full text-lg font-semibold">Archivo ERP</div>
+            <div class="w-full text-lg font-semibold">Gastos</div>
             <div class="w-full text-sm">({{Auth::user()->udn}}) - {{Auth::user()->pdv}}</div>
             <div class="w-full text-sm">({{Auth::user()->empleado}}) - {{Auth::user()->name}}</div>            
         </div> <!--FIN ENCABEZADO-->
-        <form method="post" action="{{route('erp_import')}}" enctype="multipart/form-data" id="carga_erp_ventas">
+        <form method="post" action="{{route('rentabilidad_gastos')}}" enctype="multipart/form-data" id="carga_gastos">
             @csrf
         <div class="w-full rounded-b-lg bg-ttds-secundario p-3 flex flex-col"> <!--CONTENIDO-->
+            <div class="w-full">
+                <input type="hidden" name="periodo" value="{{$periodo_carga_id}}">
+                <span class="text-xs text-gray-700">Periodo Carga</span><br>
+                <input name="descripcion" class="w-full rounded p-1 border border-gray-300 bg-white" value="{{$periodo_carga_desc}}" readonly>
+            </div>
             <div class="w-full flex flex-row space-x-2">
                 <div class="w-full">
                     <span class="text-xs text-gray-700">Archivo</span><br>
@@ -23,9 +28,11 @@
             </div>
         </div> <!--FIN CONTENIDO-->
         <div class="w-full flex justify-center py-4">
-            <button type="button" onClick="carga_erp_ventas()" class="rounded p-1 border bg-green-500 hover:bg-green-700 text-gray-100 font-semibold">Guardar</button>
+            <button type="button" onClick="carga_gastos()" class="rounded p-1 border bg-green-500 hover:bg-green-700 text-gray-100 font-semibold">Guardar</button>
         </div>
         </form>
+        <div class="">
+        </div>
         @if(session('status'))
         <div class="bg-green-200 p-4 flex justify-center font-bold rounded-b-lg">
             {{session('status')}}
@@ -150,11 +157,11 @@
         </div>
     </div>
     <script>
-        function carga_erp_ventas()
+        function carga_gastos()
         {
             document.getElementById('modal_procesa').style.display="block";
-            document.getElementById('mensaje').innerHTML = "Cargando Ventas ERP";
-            document.getElementById('carga_erp_ventas').submit();
+            document.getElementById('mensaje').innerHTML = "Cargando Gastos";
+            document.getElementById('carga_gastos').submit();
         }
     </script>
 </x-app-layout>

@@ -20,7 +20,7 @@
         </div>
         <div class="w-full rounded-b-lg bg-white p-3 flex flex-col"> <!--CONTENIDO-->
             <div class="w-full flex flex-row">
-                <div class="w-1/2 flex flex-col">
+                <div class="w-1/3 flex flex-col">
                     <div class="w-full pt-3 flex justify-center text-5xl font-semibold text-green-700">                        
                         <a href="javascript:efectividad()"><i class="fas fa-funnel-dollar"></i></a>
                     </div>
@@ -40,7 +40,7 @@
                         Dasboard Ordenes
                     </div>
                 </div>
-                <div class="w-1/2 flex flex-col">
+                <div class="w-1/3 flex flex-col">
                     <div class="w-full pt-3 flex justify-center text-5xl font-semibold text-green-700">
                         <a href="javascript:productividad()"><i class="far fa-check-circle"></i></a>
                     </div>
@@ -58,6 +58,14 @@
                     </div>
                     <div class="w-full flex justify-center">
                         Resumen efectividad
+                    </div>
+                </div>
+                <div class="w-1/3 flex flex-col">
+                    <div class="w-full pt-3 flex justify-center text-5xl font-semibold text-blue-500">
+                        <a href="javascript:rentabilidad()"><i class="fas fa-balance-scale"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Rentabilidad
                     </div>
                 </div>
             </div>
@@ -93,6 +101,11 @@
         {
             periodo=document.getElementById("periodo").value;
             document.location.href="/dashboard_resumen_efectividad/"+periodo;
+        }
+        function rentabilidad()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/dashboard_rentabilidad/"+periodo;
         }
     </script>
 </x-app-layout>

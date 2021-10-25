@@ -43,6 +43,8 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             'importe'=>$row['importe'],
             'ingreso'=>$resultado_rentabilidad['ingreso'],
             'costo_venta'=>$resultado_rentabilidad['costo'],
+            'bracket'=>$resultado_rentabilidad['bracket'],
+            'tipo_estandar'=>$resultado_rentabilidad['tipo_estandar'],
             'descripcion'=>$row['descripcion'],
             'cliente'=>$row['cliente'],
             'dn'=>$row['numero_dn'],
@@ -68,7 +70,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     }
     private function getRentabilidad($tipo,$importe)
     {
-        $regreso=array('ingreso'=>0,'costo'=>0);
+        $regreso=array('ingreso'=>0,'costo'=>0,'bracket'=>0,'tipo_estandar'=>'');
         if(
             $tipo=="Activación" || $tipo=="Activacion" ||
             $tipo=="Renovación" || $tipo=="Renovacion" ||
@@ -78,16 +80,40 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             $tipo=="Renovación Empresarial" || $tipo=="Renovacion Empresarial"
         )
         {
+            if(
+                $tipo=="Activación" || $tipo=="Activacion" ||
+                $tipo=="Activación Empresarial" || $tipo=="Activacion Empresarial"
+            ){$regreso['tipo_estandar']='ACT';}
+            if(
+
+                $tipo=="Renovación" || $tipo=="Renovacion" ||
+                $tipo=="Renovación Empresarial" || $tipo=="Renovacion Empresarial"
+            ){$regreso['tipo_estandar']='REN';}
+            if(
+                $tipo=="Activación Equipo Propio" || $tipo=="Activacion Equipo Propio"
+            ){$regreso['tipo_estandar']='AEP';}
+            if(
+                $tipo=="Renovación Equipo Propio" || $tipo=="Renovacion Equipo Propio"
+            ){$regreso['tipo_estandar']='REP';}
+
+
+
+
+            $regreso['bracket']=$this->getBracket_transaccion($importe);
             $regreso['ingreso']=$this->getIngreso_transaccion($tipo,$this->getBracket_transaccion($importe));
             $regreso['costo']=$this->getCosto_transaccion($tipo,$this->getBracket_transaccion($importe));
         }
         if($tipo=="ADD ON")
         {
+            $regreso['bracket']=$this->getBracket_addon($importe);
+            $regreso['tipo_estandar']='ADD';
             $regreso['ingreso']=$this->getIngreso_addon($tipo,$this->getBracket_addon($importe));   
             $regreso['costo']=$this->getCosto_addon($tipo,$this->getBracket_addon($importe));   
         }
         if($tipo=="Protección de equipo" || $tipo=="Proteccion de equipo")
         {
+            $regreso['bracket']=$this->getBracket_seguro($importe);
+            $regreso['tipo_estandar']='SEG';
             $regreso['ingreso']=$this->getIngreso_seguro($tipo,$this->getBracket_seguro($importe));   
             $regreso['costo']=$this->getCosto_seguro($tipo,$this->getBracket_seguro($importe));   
         }
@@ -249,7 +275,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($importe>=139 && $importe<=178) {return(3);}
         if($importe>=179 && $importe<=198) {return(4);}
         if($importe>=199 && $importe<=238) {return(5);}
-        if($importe>=238 && $importe<=20000) {return(6);}
+        if($importe>=239 && $importe<=20000) {return(6);}
     }
     private function getIngreso_seguro($tipo,$bracket)
     {

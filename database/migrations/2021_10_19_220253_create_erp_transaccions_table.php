@@ -25,6 +25,8 @@ class CreateErpTransaccionsTable extends Migration
             $table->float('importe');
             $table->float('ingreso');
             $table->float('costo_venta');
+            $table->integer('bracket',3);
+            $table->string('tipo_estandar',3);
             $table->string('descripcion')->nullable();
             $table->string('cliente')->nullable();
             $table->string('dn')->nullable();

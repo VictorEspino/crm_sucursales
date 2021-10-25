@@ -160,6 +160,14 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
                             </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('rentabilidad_gastos')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('rentabilidad_gastos') }}"
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-user float-left mx-2"></i>
+                                      Parametros Gastos
+                                    <span><i class="fa fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
                             <li class="w-full h-full py-3 px-2 border-b border-light-border bg-blue-200">
                                 Plantilla
                             </li>

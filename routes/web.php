@@ -80,6 +80,9 @@ Route::get('/dashboard_resumen_periodo/{periodo}/{tipo}/{key}/{value}', [Dashboa
 Route::get('/dashboard_resumen_efectividad/{periodo}', [DashboardsController::class,'dashboard_resumen_efectividad'])->middleware('auth')->name('dashboard_resumen_efectividad');
 Route::get('/dashboard_resumen_efectividad/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_resumen_efectividad'])->middleware('auth')->name('dashboard_resumen_efectividad');
 
+Route::get('/dashboard_rentabilidad/{periodo}', [DashboardsController::class,'dashboard_rentabilidad'])->middleware('auth')->name('dashboard_rentabilidad');
+Route::get('/dashboard_rentabilidad/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_rentabilidad'])->middleware('auth')->name('dashboard_rentabilidad');
+
 Route::get('/export_interaccion/{periodo}', [ExportController::class,'export_interaccion'])->middleware('auth');
 Route::get('/export_orden/{periodo}', [ExportController::class,'export_orden'])->middleware('auth');
 
@@ -99,3 +102,5 @@ Route::get('/plantilla_sucursal', function () {return view('plantilla_sucursal')
 
 Route::get('/erp_import', function () {return view('erp_import');})->middleware('auth')->name('erp_import');
 Route::post('/erp_import', [ExcelController::class,'erp_import'])->middleware('auth')->name('erp_import');
+Route::get('/rentabilidad_gastos',[DashboardsController::class,'forma_carga_gastos'])->middleware('auth')->name('rentabilidad_gastos');
+Route::post('/rentabilidad_gastos',[ExcelController::class,'gastos_import'])->middleware('auth')->name('rentabilidad_gastos');
