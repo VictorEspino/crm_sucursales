@@ -67,6 +67,18 @@
                     <div class="w-full flex justify-center">
                         Rentabilidad
                     </div>
+                    <div class="w-full pt-12 flex justify-center text-5xl font-semibold text-blue-700">
+                        <a href="javascript:ejecutivo()"><i class="fas fa-tachometer-alt"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Dashboard Ejecutivo
+                    </div>
+                    <div class="w-full pt-12 flex justify-center text-5xl font-semibold text-red-400">
+                        <a href="javascript:comparativo()"><i class="fas fa-atlas"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Dashboard Comparativos
+                    </div>
                 </div>
             </div>
         </div>
@@ -106,6 +118,16 @@
         {
             periodo=document.getElementById("periodo").value;
             document.location.href="/dashboard_rentabilidad/"+periodo;
+        }
+        function ejecutivo()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/dashboard_ejecutivo/"+periodo;
+        }
+        function comparativo()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/dashboard_comparativo/"+periodo;
         }
     </script>
 </x-app-layout>

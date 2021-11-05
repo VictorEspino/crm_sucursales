@@ -136,7 +136,7 @@ class DashboardsController extends Controller
         $periodos=DB::select(DB::raw(
             "select distinct periodo from estatico_dias where dia<=now() order by dia desc"
         ));
-        $periodos=collect($periodos)->take(6);
+        $periodos=collect($periodos)->take(8);
         if(!session()->has('periodo'))
         {
             $ciclo=1;
@@ -297,6 +297,7 @@ class DashboardsController extends Controller
         {
         $query_cuotas=Objetivo::select(DB::raw($campo_universo.",sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(ejecutivos) as ejecutivos"))
             ->where('periodo',$periodo)
+            ->where($campo_universo,$key_universo)
             ->groupBy($campo_universo)
             ->get()
             ->first();
@@ -1537,7 +1538,7 @@ class DashboardsController extends Controller
         $id_gastos=$periodo_gastos->id;
         $titulo_gastos=$periodo_gastos->descripcion;
         //VERIFICA QUE YA ESTAN CARGADOS SUS PARAMETROS
-        if($periodo_gastos->detailles_count==0)
+        if($periodo_gastos->detalles_count==0)
         {
             $ultimo_conocido=RentabilidadGastos::select(DB::raw('max(periodo) as id'))
                                                 ->get()
@@ -1546,6 +1547,10 @@ class DashboardsController extends Controller
             $id_gastos=$ultimo_conocido->id;
             $titulo_gastos=$periodo_alterno->descripcion;
             $consistencia=false;
+            //return($ultimo_conocido);
+        }
+        else{
+            $consistencia=true;
         }
         $titulo_principal='';
         $gastos_fijos=0;
@@ -1621,7 +1626,6 @@ class DashboardsController extends Controller
 
         return($sucursales);
                 */
-                $consistencia=true;
         $brackets=DB::select(DB::raw('select * from brackets where tipo="TRADICIONAL"'));
         
         return(view('dashboard_rentabilidad',[

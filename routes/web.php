@@ -4,8 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProcesaFormasController;
 use App\Http\Controllers\ProcesaSeguimientoController;
 use App\Http\Controllers\DashboardsController;
+use App\Http\Controllers\DashboardEjecutivoController;
+use App\Http\Controllers\DashboardComparativoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ExcelController;
+use App\Http\Controllers\ComentariosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +86,12 @@ Route::get('/dashboard_resumen_efectividad/{periodo}/{tipo}/{key}/{value}', [Das
 Route::get('/dashboard_rentabilidad/{periodo}', [DashboardsController::class,'dashboard_rentabilidad'])->middleware('auth')->name('dashboard_rentabilidad');
 Route::get('/dashboard_rentabilidad/{periodo}/{tipo}/{key}/{value}', [DashboardsController::class,'dashboard_rentabilidad'])->middleware('auth')->name('dashboard_rentabilidad');
 
+Route::get('/dashboard_ejecutivo/{periodo}', [DashboardEjecutivoController::class,'dashboard_ejecutivo'])->middleware('auth')->name('dashboard_ejecutivo');
+Route::get('/dashboard_ejecutivo/{periodo}/{tipo}/{key}/{value}', [DashboardEjecutivoController::class,'dashboard_ejecutivo'])->middleware('auth')->name('dashboard_ejecutivo');
+
+Route::get('/dashboard_comparativo/{periodo}', [DashboardComparativoController::class,'dashboard_comparativo'])->middleware('auth')->name('dashboard_comparativo');
+Route::get('/dashboard_comparativo/{periodo}/{tipo}/{key}/{value}', [DashboardComparativoController::class,'dashboard_comparativo'])->middleware('auth')->name('dashboard_comparativo');
+
 Route::get('/export_interaccion/{periodo}', [ExportController::class,'export_interaccion'])->middleware('auth');
 Route::get('/export_orden/{periodo}', [ExportController::class,'export_orden'])->middleware('auth');
 
@@ -104,3 +113,6 @@ Route::get('/erp_import', function () {return view('erp_import');})->middleware(
 Route::post('/erp_import', [ExcelController::class,'erp_import'])->middleware('auth')->name('erp_import');
 Route::get('/rentabilidad_gastos',[DashboardsController::class,'forma_carga_gastos'])->middleware('auth')->name('rentabilidad_gastos');
 Route::post('/rentabilidad_gastos',[ExcelController::class,'gastos_import'])->middleware('auth')->name('rentabilidad_gastos');
+
+Route::get('/comentarios', [ComentariosController::class,'mostrar_comentarios'])->middleware('auth')->name('comentarios');
+Route::post('/comentarios', [ComentariosController::class,'save_comentarios'])->middleware('auth')->name('comentarios');

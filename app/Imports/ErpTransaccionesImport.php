@@ -101,21 +101,21 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
 
             $regreso['bracket']=$this->getBracket_transaccion($importe);
             $regreso['ingreso']=$this->getIngreso_transaccion($tipo,$this->getBracket_transaccion($importe));
-            $regreso['costo']=$this->getCosto_transaccion($tipo,$this->getBracket_transaccion($importe));
+            $regreso['costo']=(1+0.33*30/30.4+0.03)*$this->getCosto_transaccion($tipo,$this->getBracket_transaccion($importe));
         }
         if($tipo=="ADD ON")
         {
             $regreso['bracket']=$this->getBracket_addon($importe);
             $regreso['tipo_estandar']='ADD';
             $regreso['ingreso']=$this->getIngreso_addon($tipo,$this->getBracket_addon($importe));   
-            $regreso['costo']=$this->getCosto_addon($tipo,$this->getBracket_addon($importe));   
+            $regreso['costo']=(1+0.33*30/30.4+0.03)*$this->getCosto_addon($tipo,$this->getBracket_addon($importe));   
         }
         if($tipo=="Protección de equipo" || $tipo=="Proteccion de equipo")
         {
             $regreso['bracket']=$this->getBracket_seguro($importe);
             $regreso['tipo_estandar']='SEG';
             $regreso['ingreso']=$this->getIngreso_seguro($tipo,$this->getBracket_seguro($importe));   
-            $regreso['costo']=$this->getCosto_seguro($tipo,$this->getBracket_seguro($importe));   
+            $regreso['costo']=(1+0.33*30/30.4+0.03)*$this->getCosto_seguro($tipo,$this->getBracket_seguro($importe));   
         }
         return($regreso);
     }
