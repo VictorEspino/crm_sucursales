@@ -11,6 +11,126 @@
             <div class="w-full text-sm text-red-700 font-bold"><a href="javascript: window.history.back()"><< Regresar</a></div>
         @endif
         </div> <!--FIN ENCABEZADO-->
+
+        <?php
+        if($origen=="R"||$origen=="D")
+        {
+    ?>
+    <div class="w-full bg-gray-200 p-3 flex flex-col">
+        <div class="w-full text-lg font-semibold">Detalles</div>
+    </div>
+    <div class="w-full bg-white p-3 flex justify-center text-xs">
+        <table class="">
+            <tr>
+                <td class="px-2" colspan=2> </td>
+                <td class="bg-green-500 border border-gray-400 text-gray-200 font-semibold px-2" colspan=3><center>Flujo</td>
+                <td class="bg-green-300 border border-gray-400 text-gray-600 font-semibold px-2" colspan=3><center>Activaciones</td>
+                <td class="bg-green-500 border border-gray-400 text-gray-200 font-semibold px-2" colspan=3><center>Renovaciones</td>
+                <td class="bg-green-300 border border-gray-400 text-gray-600 font-semibold px-2" colspan=2><center>Efectividad<br>Tienda</td>
+                <td class="bg-green-500 border border-gray-400 text-gray-200 font-semibold px-2" colspan=2><center>Efectividad<br>Generacion</td>
+                <td class="bg-green-300 border border-gray-400 text-gray-600 font-semibold px-2" colspan=2><center>Productividad<br>Tienda</td>
+                <td class="bg-green-500 border border-gray-400 text-gray-200 font-semibold px-2" colspan=2><center>Productividad<br>Generacion</td>
+                <td class="bg-green-300 border border-gray-400 text-gray-600 font-semibold px-2" colspan=1><center>Prod</td>
+                <td class="bg-green-500 border border-gray-400 text-gray-200 font-semibold px-2" colspan=2><center>Pendientes<br>Facturacion</td>
+                <td class="bg-green-300 border border-gray-400 text-gray-600 font-semibold px-2" colspan=1><center>Ticket<br>Promedio</td>
+            <tr>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2" colspan=2></td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Total</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">C/Int</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">%</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Total</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Cuota</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">%</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Total</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Cuota</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">%</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2"># Solic</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">% vs Traf</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2"># Solic</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">% vs Cont</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Ventas</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">% vs Traf</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Ventas</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">% vs Cont</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2"><center>%</center></td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Solic</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Monto<br>Prom</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2"><center>$</center></td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Plantilla</td>
+                <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-2">Rentabilid</td>
+
+
+            </tr>
+            <?php
+            $color=false;
+            foreach($detalles as $detalle)
+            {
+            ?>
+            <tr>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><a href="/dashboard_ejecutivo/{{$periodo}}/{{($origen=="G"?'E':($origen=="R"?"G":"R"))}}/{{$detalle['key']}}/{{$detalle['value']}}">{{$detalle['key']}}</a></td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2">{{$detalle['value']}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['flujo']['flujo'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['flujo']['flujo_intencion'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{intval($detalle['indicadores']['flujo']['flujo'])>0?number_format(100*$detalle['indicadores']['flujo']['flujo_intencion']/$detalle['indicadores']['flujo']['flujo'],0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['ventas']['act_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['cuotas']['ac']+$detalle['indicadores']['cuotas']['asi'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{($detalle['indicadores']['cuotas']['ac']+$detalle['indicadores']['cuotas']['asi'])>0?number_format(100*$detalle['indicadores']['ventas']['act_total']/($detalle['indicadores']['cuotas']['ac']+$detalle['indicadores']['cuotas']['asi']),0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['ventas']['ren_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['cuotas']['rc']+$detalle['indicadores']['cuotas']['rs'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{($detalle['indicadores']['cuotas']['rc']+$detalle['indicadores']['cuotas']['rs'])>0?number_format(100*$detalle['indicadores']['ventas']['ren_total']/($detalle['indicadores']['cuotas']['rc']+$detalle['indicadores']['cuotas']['rs']),0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['solicitudes']['tda_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{$detalle['indicadores']['flujo']['flujo']>0?number_format(100*$detalle['indicadores']['solicitudes']['tda_total']/$detalle['indicadores']['flujo']['flujo'],0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['solicitudes']['dem_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{$detalle['indicadores']['demanda']['demanda_total']>0?number_format(100*$detalle['indicadores']['solicitudes']['dem_total']/$detalle['indicadores']['demanda']['demanda_total'],0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['ventas']['act_con_tda_total']+$detalle['indicadores']['ventas']['act_sin_tda_total']+$detalle['indicadores']['ventas']['ren_con_tda_total']+$detalle['indicadores']['ventas']['ren_sin_tda_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{$detalle['indicadores']['flujo']['flujo']>0?number_format(100*($detalle['indicadores']['ventas']['act_con_tda_total']+$detalle['indicadores']['ventas']['act_sin_tda_total']+$detalle['indicadores']['ventas']['ren_con_tda_total']+$detalle['indicadores']['ventas']['ren_sin_tda_total'])/$detalle['indicadores']['flujo']['flujo'],0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['ventas']['act_con_dem_total']+$detalle['indicadores']['ventas']['act_sin_dem_total']+$detalle['indicadores']['ventas']['ren_con_dem_total']+$detalle['indicadores']['ventas']['ren_sin_dem_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{$detalle['indicadores']['demanda']['demanda_total']>0?number_format(100*($detalle['indicadores']['ventas']['act_con_dem_total']+$detalle['indicadores']['ventas']['act_sin_dem_total']+$detalle['indicadores']['ventas']['ren_con_dem_total']+$detalle['indicadores']['ventas']['ren_sin_dem_total'])/$detalle['indicadores']['demanda']['demanda_total'],0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center><b>{{number_format(intval($detalle['indicadores']['cuotas']['minutos']-$detalle['indicadores']['productividad']['total']['incidencias'])>0?100*$detalle['indicadores']['productividad']['total']['minutos']/($detalle['indicadores']['cuotas']['minutos']-$detalle['indicadores']['productividad']['total']['incidencias']):0,0)}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['pendientes']['pendientes_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>${{intval($detalle['indicadores']['pendientes']['pendientes_total'])>0?number_format($detalle['indicadores']['pendientes']['monto_total']/$detalle['indicadores']['pendientes']['pendientes_total'],0):0}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>${{number_format($detalle['indicadores']['ventas']['act_ticket_total'],0)}}</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{$detalle['indicadores']['cuotas']['ejecutivos']>0?number_format(100*$detalle['indicadores']['activos']['activos']/$detalle['indicadores']['cuotas']['ejecutivos'],0):0}}%</td>
+                <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-2"><center>{{number_format($detalle['indicadores']['rentabilidad']['rentabilidad'],0)}}%</td>
+            </tr>
+            <?php
+                $color=!$color;
+            }
+            ?>
+            <tr class="text-sm">
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"></td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2">Total</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['flujo']['flujo'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['flujo']['flujo_intencion'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{intval($indicadores['flujo']['flujo'])>0?number_format(100*$indicadores['flujo']['flujo_intencion']/$indicadores['flujo']['flujo'],0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['ventas']['act_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['cuotas']['ac']+$indicadores['cuotas']['asi'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{($indicadores['cuotas']['ac']+$indicadores['cuotas']['asi'])>0?number_format(100*$indicadores['ventas']['act_total']/($indicadores['cuotas']['ac']+$indicadores['cuotas']['asi']),0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['ventas']['ren_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['cuotas']['rc']+$indicadores['cuotas']['rs'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{($indicadores['cuotas']['rc']+$indicadores['cuotas']['rs'])>0?number_format(100*$indicadores['ventas']['ren_total']/($indicadores['cuotas']['rc']+$indicadores['cuotas']['rs']),0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['solicitudes']['tda_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{$indicadores['flujo']['flujo']>0?number_format(100*$indicadores['solicitudes']['tda_total']/$indicadores['flujo']['flujo'],0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['solicitudes']['dem_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{$indicadores['demanda']['demanda_total']>0?number_format(100*$indicadores['solicitudes']['dem_total']/$indicadores['demanda']['demanda_total'],0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['ventas']['act_con_tda_total']+$indicadores['ventas']['act_sin_tda_total']+$indicadores['ventas']['ren_con_tda_total']+$indicadores['ventas']['ren_sin_tda_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{$indicadores['flujo']['flujo']>0?number_format(100*($indicadores['ventas']['act_con_tda_total']+$indicadores['ventas']['act_sin_tda_total']+$indicadores['ventas']['ren_con_tda_total']+$indicadores['ventas']['ren_sin_tda_total'])/$indicadores['flujo']['flujo'],0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['ventas']['act_con_dem_total']+$indicadores['ventas']['act_sin_dem_total']+$indicadores['ventas']['ren_con_dem_total']+$indicadores['ventas']['ren_sin_dem_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{$indicadores['demanda']['demanda_total']>0?number_format(100*($indicadores['ventas']['act_con_dem_total']+$indicadores['ventas']['act_sin_dem_total']+$indicadores['ventas']['ren_con_dem_total']+$indicadores['ventas']['ren_sin_dem_total'])/$indicadores['demanda']['demanda_total'],0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center><b>{{number_format(intval($indicadores['cuotas']['minutos']-$indicadores['productividad']['total']['incidencias'])>0?100*$indicadores['productividad']['total']['minutos']/($indicadores['cuotas']['minutos']-$indicadores['productividad']['total']['incidencias']):0,0)}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['pendientes']['pendientes_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>${{intval($indicadores['pendientes']['pendientes_total'])>0?number_format($indicadores['pendientes']['monto_total']/$indicadores['pendientes']['pendientes_total'],0):0}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>${{number_format($indicadores['ventas']['act_ticket_total'],0)}}</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{$indicadores['cuotas']['ejecutivos']>0?number_format(100*$indicadores['activos']['activos']/$indicadores['cuotas']['ejecutivos'],0):0}}%</td>
+                <td class="bg-gray-700 border border-gray-400 text-gray-200 font-light px-2"><center>{{number_format($indicadores['rentabilidad']['rentabilidad'],0)}}%</td>
+            </tr>
+        </table>
+    </div>
+    <?php
+        }
+    ?>
+
+
         <div class="w-full  bg-white rounded-b-lg p-3 flex flex-wrap space-y-10">
             <div></div>
             <div class="w-1/3 p-3"><!--DIV INDICADOR-->
@@ -808,48 +928,5 @@
                 </div>
             </div> <!--FIN DIV INDICADOR-->
         </div> <!--FIN CONTENIDO-->
-        <?php
-            if($origen=="R"||$origen=="D")
-            {
-        ?>
-        <div class="w-full bg-gray-200 p-3 flex flex-col">
-            <div class="w-full text-lg font-semibold">Detalles</div>
-        </div>
-        <div class="w-full bg-white p-3 flex justify-center text-sm">
-            <table class="">
-                <tr>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3"></td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3"></td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Flujo con Intencion</td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Activaciones</td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">% Cuota Act</td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">Renovaciones</td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">% Cuota Ren</td>
-                    <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-3">% Productividad</td>
-                </tr>
-                <?php
-                $color=false;
-                foreach($detalles as $detalle)
-                {
-                ?>
-                <tr>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><a href="/dashboard_ejecutivo/{{$periodo}}/{{($origen=="G"?'E':($origen=="R"?"G":"R"))}}/{{$detalle['key']}}/{{$detalle['value']}}">{{$detalle['key']}}</a></td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3">{{$detalle['value']}}</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{intval($detalle['indicadores']['flujo']['flujo'])>0?number_format(100*$detalle['indicadores']['flujo']['flujo_intencion']/$detalle['indicadores']['flujo']['flujo'],0):0}}%</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle['indicadores']['ventas']['act_total'],0)}}</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{($detalle['indicadores']['cuotas']['ac']+$detalle['indicadores']['cuotas']['asi'])>0?number_format(100*$detalle['indicadores']['ventas']['act_total']/($detalle['indicadores']['cuotas']['ac']+$detalle['indicadores']['cuotas']['asi']),0):0}}%</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle['indicadores']['ventas']['ren_total'],0)}}</td>
-                        <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{($detalle['indicadores']['cuotas']['rc']+$detalle['indicadores']['cuotas']['rs'])>0?number_format(100*$detalle['indicadores']['ventas']['ren_total']/($detalle['indicadores']['cuotas']['rc']+$detalle['indicadores']['cuotas']['rs']),0):0}}%</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{($detalle['indicadores']['cuotas']['minutos']-$detalle['indicadores']['productividad']['total']['incidencias'])>0?number_format(100*$detalle['indicadores']['productividad']['total']['minutos']/($detalle['indicadores']['cuotas']['minutos']-$detalle['indicadores']['productividad']['total']['incidencias']),0):0}}%</td>
-                </tr>
-                <?php
-                    $color=!$color;
-                }
-                ?>
-            </table>
-        </div>
-        <?php
-            }
-        ?>
     </div>    
 </x-app-layout>

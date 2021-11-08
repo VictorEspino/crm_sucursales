@@ -128,7 +128,7 @@ class DashboardsController extends Controller
         $periodos=DB::select(DB::raw(
             "select distinct periodo from estatico_dias where dia<=now() order by dia desc"
         ));
-        $periodos=collect($periodos)->take(6);
+        $periodos=collect($periodos)->take(8);
         return(view('modificar_objetivo',['periodos'=>$periodos]));
     }
     public function dashboard_central()
