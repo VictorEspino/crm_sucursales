@@ -20,6 +20,14 @@
                         <option value="Llamada" class="" {{old('origen')=="Llamada"?'selected':''}}>Llamada</option>
                         <option value="SMS" class="" {{old('origen')=="SMS"?'selected':''}}>SMS</option>
                         <option value="Redes Sociales" class="" {{old('origen')=="Redes Sociales"?'selected':''}}>Redes Sociales</option>
+                        <?php
+                        if(isset($_GET['ff']))
+                        {
+                        ?>
+                        <option value="Tienda" class="" {{old('origen')=="Tienda"?'selected':''}}>Tienda</option>
+                        <?php
+                        }
+                        ?>
                     </select>    
                     @error('origen')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>

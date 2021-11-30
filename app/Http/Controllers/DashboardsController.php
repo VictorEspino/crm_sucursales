@@ -863,7 +863,7 @@ class DashboardsController extends Controller
         {
             ;
         }
-        $minutos_sucursal=360;
+        $minutos_sucursal=420;
         if($origen=="E" || $origen=="G")
         {
             try{
@@ -872,7 +872,7 @@ class DashboardsController extends Controller
             }
             catch(\Exception $e)
             {
-                $minutos_sucursal=360;
+                $minutos_sucursal=420;
             }
         }
         $minutos_objetivo=$minutos_sucursal*$ejecutivos;
@@ -1031,6 +1031,15 @@ class DashboardsController extends Controller
         $rs=0;
         $min_diario=0;
         $ejecutivos=0;
+
+        $ac_q1=0;
+        $as_q1=0;
+        $rc_q1=0;
+        $rs_q1=0;
+        $ac_q2=0;
+        $as_q2=0;
+        $rc_q2=0;
+        $rs_q2=0;
         if($origen=="E")
         {
             $usuario=User::where('empleado',$key_universo)->get()->first();

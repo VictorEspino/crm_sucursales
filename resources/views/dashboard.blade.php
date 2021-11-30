@@ -60,6 +60,7 @@
                         Resumen efectividad
                     </div>
                 </div>
+                @if(Auth::user()->puesto!='Ejecutivo' && Auth::user()->puesto!='Otro')
                 <div class="w-1/3 flex flex-col">
                     <div class="w-full pt-3 flex justify-center text-5xl font-semibold text-blue-500">
                         <a href="javascript:rentabilidad()"><i class="fas fa-balance-scale"></i></a>
@@ -80,6 +81,7 @@
                         Dashboard Comparativos
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

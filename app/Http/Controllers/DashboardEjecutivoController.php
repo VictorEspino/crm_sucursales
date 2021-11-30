@@ -78,6 +78,7 @@ class DashboardEjecutivoController extends Controller
             $regiones=Interaccion::select(DB::raw('distinct region'))
                         ->whereRaw('lpad(created_at,7,0)=?',[$periodo])
                         ->get();
+            //return($indicadores);
             foreach($regiones as $region)
             {
                 $detalles[]=[
@@ -260,10 +261,9 @@ class DashboardEjecutivoController extends Controller
     }
     private function getCuotas($campo_universo,$key_universo,$periodo,$dias_transcurridos)
     {
-        $cuotas=Objetivo::select(DB::raw("sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(ac_q1) as ac_q1,sum(as_q1) as as_q1,sum(rc_q1) as rc_q1,sum(rs_q1) as rs_q1,sum(ac_q2) as ac_q2,sum(as_q2) as as_q2,sum(rc_q2) as rc_q2,sum(rs_q2) as rs_q2,".$dias_transcurridos."*sum(min_diario)*sum(ejecutivos) as minutos,".$dias_transcurridos."*sum(min_diario)*sum(ejecutivos)/2 as minutos_q1,".$dias_transcurridos."*sum(min_diario)*sum(ejecutivos)/2 as minutos_q2,sum(ejecutivos) as ejecutivos"))
+        $cuotas=Objetivo::select(DB::raw("sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(ac_q1) as ac_q1,sum(as_q1) as as_q1,sum(rc_q1) as rc_q1,sum(rs_q1) as rs_q1,sum(ac_q2) as ac_q2,sum(as_q2) as as_q2,sum(rc_q2) as rc_q2,sum(rs_q2) as rs_q2,".$dias_transcurridos."*avg(min_diario)*sum(ejecutivos) as minutos,".$dias_transcurridos."*avg(min_diario)*sum(ejecutivos)/2 as minutos_q1,".$dias_transcurridos."*avg(min_diario)*sum(ejecutivos)/2 as minutos_q2,sum(ejecutivos) as ejecutivos"))
             ->where('periodo',$periodo)
             ->when($campo_universo!="0",function($query) use ($campo_universo,$key_universo){$query->where($campo_universo,$key_universo);})
-            ->get()
             ->first();
         return($cuotas);
     }
