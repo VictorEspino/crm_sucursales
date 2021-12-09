@@ -26,6 +26,8 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
 <!-- PARA EL DASHBOARD -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
+
+
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     <style>
