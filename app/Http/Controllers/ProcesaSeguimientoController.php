@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Funnel;
 use App\Models\Ordenes;
 use App\Models\Incidencia;
+use App\Models\Objetivo;
+use App\Models\Sucursal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -169,5 +171,25 @@ class ProcesaSeguimientoController extends Controller
                                 ->paginate(10);
             return(view('seguimiento_incidencias',['registros'=>$registros,'query'=>'']));
         }
+    }
+    public function objetivos_review(Request $request)
+    {
+        $campo_filtro='0';
+        $valor_filtro='0';
+        if(Auth::user()->puesto=='Regional')
+        {
+            $campo_filtro='region';
+            $valor_filtro=Auth::user()->region;
+        }
+        $sql_registros="
+        select * from (
+            select a.udn,a.pdv,a.region,sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos from (
+            SELECT udn,pdv,region,0 as ac,0 as asi,0 as rc,0 as rs,0 as min_diario,0 as ejecutivos FROM sucursals where estatus='Activo' and ".$campo_filtro."='".$valor_filtro."'
+            UNION
+            SELECT udn,pdv,region,ac,asi,rc,rs,min_diario,ejecutivos from objetivos where periodo='".substr(now(),0,7)."' and ".$campo_filtro."='".$valor_filtro."'
+                ) as a group by a.udn,a.pdv,a.region) as b order by b.region asc,b.pdv asc
+        ";
+        $registros=DB::select(DB::raw($sql_registros));
+        return(view('objetivos_review',['registros'=>$registros]));
     }
 }

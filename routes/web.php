@@ -104,6 +104,7 @@ Route::post('/actividad_extra_nuevo', [ProcesaFormasController::class,'actividad
 
 Route::get('/objetivo_update', [DashboardsController::class,'objetivo_form'])->middleware('auth')->name('objetivo_update');
 Route::post('/objetivo_update', [ProcesaFormasController::class,'objetivo_update'])->middleware('auth')->name('objetivo_update');
+Route::get('/objetivos_review',[ProcesaSeguimientoController::class,'objetivos_review'])->middleware('auth')->name('objetivos_review');
 
 Route::get('/objetivo_consulta/{periodo}/{udn}', [ProcesaFormasController::class,'objetivo_consulta'])->middleware('auth')->name('objetivo_consulta');
 

@@ -19,6 +19,7 @@ class CreateSucursalsTable extends Migration
             $table->string('pdv');
             $table->string('region');
             $table->integer('min_diario');
+            $table->string('estatus')->defaul('Activo');
             $table->timestamps();
         });
     }

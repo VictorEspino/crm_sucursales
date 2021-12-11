@@ -149,6 +149,16 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
                                     <span><i class="fas fa-angle-right float-right"></i></span>
                                 </a>
                             </li>
+                            @if(Auth::user()->puesto=='Regional' || Auth::user()->puesto=='Director')
+                            <li class=" w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('objetivos_review')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('objetivos_review') }}" 
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-tachometer-alt float-left mx-2"></i>
+                                        Estatus Objetivos
+                                    <span><i class="fas fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
+                            @endif
                             @if(Auth::user()->puesto=='Regional' || Auth::user()->puesto=='Gerente')
                             <li class=" w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('objetivo_update')?'bg-gray-100':'br-gray-800'}}">
                                 <a href="{{ route('objetivo_update') }}" 
