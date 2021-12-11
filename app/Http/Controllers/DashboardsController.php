@@ -20,6 +20,25 @@ use App\Models\ErpTransaccion;
 
 class DashboardsController extends Controller
 {
+    public static function alert_objetivos()
+    {
+        if(Auth::user()->puesto=='Regional' || Auth::user()->puesto=='Director' )
+            {return("0");}
+        else
+            {
+                $periodo_actual=substr(now(),0,7);
+                try{
+                    $sucursal_medida=Objetivo::where('udn',Auth::user()->udn)->where('periodo',$periodo_actual)->get()->first();
+                    $minutos=$sucursal_medida->min_diario;
+                    return("0");
+                }
+                catch(\Exception $e)
+                {
+                    $minutos=360;
+                    return("1");
+                }
+            }
+    }
     public static function gauge($tipo)
     {
         if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
@@ -787,26 +806,28 @@ class DashboardsController extends Controller
                 $campos_vista="region as llave,region as value";
             }
         }
+
+        $hoy=substr(now(),0,10);
+
         $sql_tiempos="
-            select dia,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
-                SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
+            select dia,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras,max(indice) as indice from (
+                SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras ,'A' as indice FROM `estatico_dias` WHERE dia<='".$hoy."' and periodo='".$periodo."'
                 UNION
-                select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+                select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'B' as indice  from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
                 UNION
-                select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+                select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'C' as indice  from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
                 UNION
-                select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+                select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'D' as indice  from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
                 UNION
-                select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by dia_trabajo
+                select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'E' as indice from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$hoy."' group by dia_trabajo
                 UNION
-                select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' group by dia_incidencia
+                select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras,'F' as indice  from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' and dia_incidencia<='".$hoy."' group by dia_incidencia
                 UNION
-                select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+                select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'G' as indice  from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
                 UNION
-                select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by dia_trabajo
+                select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras,'H' as indice  from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$hoy."' group by dia_trabajo
             )as a group by dia
         ";
-        //return($sql_tiempos);
         $query_tiempos=DB::select(DB::raw(
                 $sql_tiempos
             ));
@@ -823,6 +844,7 @@ class DashboardsController extends Controller
 
         
         $ejecutivos=0;
+        $min_objetivo=0;
         $ac=0;
         $as=0;
         $rc=0;
@@ -834,48 +856,51 @@ class DashboardsController extends Controller
             $usuario_consultado=User::where('empleado',$key_universo)->get()->first();
             $key_universo=$usuario_consultado->udn;         
         }
-        $query_objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ejecutivos) as ejecutivos,sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs'))
+        $query_objetivos=Objetivo::select(DB::raw($campo_universo.',ejecutivos,ac,asi,rc,rs,min_diario'))
                             ->where('periodo',$periodo)
                             ->whereRaw(''.$campo_universo.'=?',$key_universo)
-                            ->groupBy($campo_universo)
-                            ->get()
-                            ->first();
+                            ->get();
         //return($query_objetivos);
+
+        foreach($query_objetivos as $objetivo)
+        {
+            $ejecutivos=$ejecutivos+$objetivo->ejecutivos;
+            $min_objetivo=$min_objetivo+$objetivo->ejecutivos*$objetivo->min_diario;
+            $ac=$ac+$objetivo->ac;
+            $as=$as+$objetivo->asi;
+            $rc=$rc+$objetivo->rc;
+            $rs=$rs+$objetivo->rs;
+        }
+
         try{
             if($origen=="E") 
             {
+                $ac=$ac/$ejecutivos;
+                $as=$as/$ejecutivos;
+                $rc=$rc/$ejecutivos;
+                $rs=$rs/$ejecutivos;
+                $min_objetivo=$min_objetivo/$ejecutivos;
                 $ejecutivos=1;
-                $ac=$query_objetivos->ac/$ejecutivos;
-                $as=$query_objetivos->asi/$ejecutivos;
-                $rc=$query_objetivos->rc/$ejecutivos;
-                $rs=$query_objetivos->rs/$ejecutivos;
-            }
-            else
-            {
-                $ejecutivos=$query_objetivos->ejecutivos;
-                $ac=$query_objetivos->ac;
-                $as=$query_objetivos->asi;
-                $rc=$query_objetivos->rc;
-                $rs=$query_objetivos->rs;
             }
         }
         catch(\Exception $e)
         {
             ;
         }
+        /*
         $minutos_sucursal=420;
         if($origen=="E" || $origen=="G")
         {
             try{
-            $sucursal_medida=Objetivo::where('udn',Auth::user()->udn)->where('periodo',$periodo)->get()->first();
+            $sucursal_medida=Objetivo::where('udn',Auth::user()->udn)->where('periodo',$periodo)->dd()->first();
             $minutos_sucursal=$sucursal_medida->min_diario;
             }
             catch(\Exception $e)
             {
                 $minutos_sucursal=420;
             }
-        }
-        $minutos_objetivo=$minutos_sucursal*$ejecutivos;
+        }*/
+        $minutos_objetivo=$min_objetivo;
         $minutos_productivos_acum=0;
         $minutos_objetivo_acum=0;
         $minutos_incidencias_acum=0;
@@ -893,6 +918,7 @@ class DashboardsController extends Controller
 
 
         $details=0;
+        $objetivos_detail="";
         if($origen=='G'||$origen=='R'||$origen=="D")
         {   
             $eje_fix="sum(ejecutivos)";
@@ -900,6 +926,7 @@ class DashboardsController extends Controller
             {
                 $eje_fix="1";
             }
+
             $sql_detalles="select llave,value,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,".$eje_fix." as ejecutivos,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
                 select ".$campos_vista.",sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
                 UNION
@@ -907,13 +934,13 @@ class DashboardsController extends Controller
                 UNION
                 select ".$campos_vista.",0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group."
                 UNION
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by ".$campos_group."
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$hoy."' group by ".$campos_group."
                 UNION
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' group by ".$campos_group."
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' and dia_incidencia<='".$hoy."' group by ".$campos_group."
                 UNION
                 select ".$campos_vista.",0 as interaccion,sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes, 0 as demanda, 0 as ejecutivos, 0 as incidencias, 0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group." 
                 UNION
-                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by ".$campos_group." 
+                select ".$campos_vista.",0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as ejecutivos,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$hoy."' group by ".$campos_group." 
                 ";
             $sql_adicional_detalles="
                 UNION 
@@ -923,11 +950,47 @@ class DashboardsController extends Controller
                 $sql_detalles=$sql_detalles."".$sql_adicional_detalles;
             }
             $sql_final=")as a group by a.llave,a.value";
+            
             $sql_detalles=$sql_detalles."".$sql_final;
-
             $details=DB::select(DB::raw(
                 $sql_detalles
             ));
+            if($origen=="R")
+            {
+                $objetivos_detail=Objetivo::where('periodo',$periodo)->get();
+            }
+            if($origen=="D")
+            {
+                $regiones=Objetivo::select(DB::raw('distinct region as region'))
+                                    ->where('periodo',$periodo)->get();
+                $objetivos_detail=[];
+                foreach($regiones as $region)
+                {
+                    $min_diario_region=0;
+                    $objetivos_region=Objetivo::where('region',$region->region)->where('periodo',$periodo)->get();
+                    foreach($objetivos_region as $objetivos)
+                    {
+                        $min_diario_region=$min_diario_region+$objetivos->min_diario*$objetivos->ejecutivos;
+                    }
+                    $objetivos_detail[]=['region'=>$region->region,'min_diario'=>$min_diario_region];
+                }
+                $objetivos_detail=collect($objetivos_detail);
+            }
+            if($origen=="G")
+            {
+                $ejecutivos=User::select('empleado')
+                                    ->where('estatus','Activo')
+                                    ->where('puesto','Ejecutivo')
+                                    ->where('udn',$key_universo)->get();
+                $objetivo=Objetivo::where('udn',$key_universo)->where('periodo',$periodo)->get()->first();
+                $objetivos_detail=[];
+                foreach($ejecutivos as $ejecutivo)
+                {
+                    $min_diario_ejecutivo=$objetivo->min_diario;
+                    $objetivos_detail[]=['empleado'=>$ejecutivo->empleado,'min_diario'=>$min_diario_ejecutivo];
+                }
+                $objetivos_detail=collect($objetivos_detail);
+            }
         }
         return (view('dashboard_productividad',['periodo'=>$periodo,
                                                 'origen'=>$origen,
@@ -938,7 +1001,6 @@ class DashboardsController extends Controller
                                                 'as'=> $as,
                                                 'rc'=> $rc,
                                                 'rs'=> $rs,
-                                                'minutos_sucursal'=>$minutos_sucursal,
                                                 'minutos_objetivo'=>$minutos_objetivo,
                                                 'minutos_objetivo_acum'=>$minutos_objetivo_acum,
                                                 'minutos_productivos_acum'=>$minutos_productivos_acum,
@@ -946,7 +1008,8 @@ class DashboardsController extends Controller
                                                 'dias_transcurridos'=>$dias_transcurridos,
                                                 'dias_incidencias'=>$dias_incidencias,
                                                 'reg_incidencias'=>$reg_incidencias,
-                                                'details'=>$details
+                                                'details'=>$details,
+                                                'objetivos_detail'=>$objetivos_detail
           ]));
     }
     public function dashboard_resumen_periodo(Request $request)
@@ -1031,7 +1094,7 @@ class DashboardsController extends Controller
         $rs=0;
         $min_diario=0;
         $ejecutivos=0;
-
+        $min_diario_ejecutivos=0;
         $ac_q1=0;
         $as_q1=0;
         $rc_q1=0;
@@ -1040,6 +1103,9 @@ class DashboardsController extends Controller
         $as_q2=0;
         $rc_q2=0;
         $rs_q2=0;
+
+        $hoy=substr(now(),0,10);
+
         if($origen=="E")
         {
             $usuario=User::where('empleado',$key_universo)->get()->first();
@@ -1051,7 +1117,6 @@ class DashboardsController extends Controller
                             ->where('periodo',$periodo)
                             ->groupBy('udn')
                             ->get();
-
             foreach($objetivos as $objetivo)
             {
                 $ejecutivos_sucursal=$objetivo->ejecutivos;
@@ -1068,40 +1133,38 @@ class DashboardsController extends Controller
                 $rc_q2=$objetivo->rc_q2/$ejecutivos_sucursal;
                 $rs_q2=$objetivo->rs_q2/$ejecutivos_sucursal;
                 $min_diario=$objetivo->min_diario;
+                $min_diario_ejecutivos=$objetivo->min_diario;
                 $ejecutivos=1;
             }
         }
         else
         {
-            $objetivos=Objetivo::select(DB::raw($campo_universo.',sum(ac) as ac,sum(asi) as asi,sum(rc) as rc,sum(rs) as rs,
-                                                sum(ac_q1) as ac_q1,sum(as_q1) as as_q1,sum(rc_q1) as rc_q1,sum(rs_q1) as rs_q1,
-                                                sum(ac_q2) as ac_q2,sum(as_q2) as as_q2,sum(rc_q2) as rc_q2,sum(rs_q2) as rs_q2,
-                                                sum(min_diario) as min_diario,sum(ejecutivos) as ejecutivos'))
-                            ->whereRaw(''.$campo_universo.'=?',$key_universo)
+            $objetivos=Objetivo::whereRaw(''.$campo_universo.'=?',$key_universo)
                             ->where('periodo',$periodo)
-                            ->groupBy($campo_universo)
                             ->get();
 
             foreach($objetivos as $objetivo)
             {
-                $ac=$objetivo->ac;
-                $as=$objetivo->asi;
-                $rc=$objetivo->rc;
-                $rs=$objetivo->rs;
-                $ac_q1=$objetivo->ac_q1;
-                $as_q1=$objetivo->as_q1;
-                $rc_q1=$objetivo->rc_q1;
-                $rs_q1=$objetivo->rs_q1;
-                $ac_q2=$objetivo->ac_q2;
-                $as_q2=$objetivo->as_q2;
-                $rc_q2=$objetivo->rc_q2;
-                $rs_q2=$objetivo->rs_q2;
-                $min_diario=$objetivo->min_diario;
-                $ejecutivos=$objetivo->ejecutivos;
+                $ac=$ac+$objetivo->ac;
+                $as=$as+$objetivo->asi;
+                $rc=$rc+$objetivo->rc;
+                $rs=$rs+$objetivo->rs;
+                $ac_q1=$ac_q1+$objetivo->ac_q1;
+                $as_q1=$as_q2+$objetivo->as_q1;
+                $rc_q1=$rc_q1+$objetivo->rc_q1;
+                $rs_q1=$rs_q1+$objetivo->rs_q1;
+                $ac_q2=$ac_q2+$objetivo->ac_q2;
+                $as_q2=$as_q2+$objetivo->as_q2;
+                $rc_q2=$rc_q2+$objetivo->rc_q2;
+                $rs_q2=$rs_q2+$objetivo->rs_q2;
+                $min_diario=$min_diario+$objetivo->min_diario;
+                $ejecutivos=$ejecutivos+$objetivo->ejecutivos;
+                $min_diario_ejecutivos=$min_diario_ejecutivos+($objetivo->min_diario*$objetivo->ejecutivos);
+                
             }
         }
         
-
+        //return($min_diario_ejecutivos);
         //return($objetivos);
 
         $avances=Ordenes::select(DB::raw('producto, count(*) as lineas,sum(renta) as rentas'))
@@ -1157,25 +1220,24 @@ class DashboardsController extends Controller
 
 
         $sql_tiempos="
-        select lpad(dia,7,0) as periodo,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
-            SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
+        select lpad(dia,7,0) as periodo,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras,max(indice) as indice from (
+            SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'A' as indice FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
             UNION
-            select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'B' as indice from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
             UNION
-            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'C' as indice from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
             UNION
-            select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'D' as indice from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
             UNION
-            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by dia_trabajo
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'E' as indice from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$hoy."' group by dia_trabajo
             UNION
-            select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' group by dia_incidencia
+            select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras,'F' as indice from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' and dia_incidencia<='".$hoy."' group by dia_incidencia
             UNION
-            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'G' as indice from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' group by lpad(created_at,10,0)
             UNION
-            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' group by dia_trabajo
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras,'H' as indice from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$hoy."' group by dia_trabajo
         )as a group by lpad(dia,7,0)
         ";
-        //return($sql_tiempos);
         $query_tiempos=DB::select(DB::raw(
                 $sql_tiempos
             ));
@@ -1192,28 +1254,28 @@ class DashboardsController extends Controller
 
             $incidencias=$incidencias+$tiempos->incidencias;
         }
-        //return('min_diario='.$min_diario.', dias_transcurridos='.$dias_transcurridos->transcurridos.', Incidencias='.$incidencias);
-        $minutos_objetivo=$ejecutivos*$min_diario*$dias_transcurridos->transcurridos-$incidencias;
+        //return('Incidencias='.$incidencias);
+        $minutos_objetivo=($min_diario_ejecutivos*$dias_transcurridos->transcurridos)-$incidencias;
         
         $p_productividad=$minutos_objetivo>0?100*$tiempo_productivo/$minutos_objetivo:0;
 
         $sql_tiempos_q1="
-        select lpad(dia,7,0) as periodo,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras from (
-            SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
+        select lpad(dia,7,0) as periodo,sum(interaccion) as interaccion,sum(funnel) as funnel,sum(ordenes) as ordenes,sum(demanda) as demanda,sum(incidencias) as incidencias,sum(dias_incidencias) as dias_incidencias,sum(otras) as otras,max(indice) as indice from (
+            SELECT dia as dia,0 as interaccion,0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'A' as indice FROM `estatico_dias` WHERE dia<=now() and periodo='".$periodo."'
             UNION
-            select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,sum(minutos) as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'B' as indice from interaccions where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
             UNION
-            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos) as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'C' as indice from funnels where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
             UNION
-            select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,0 as interaccion, 0 as funnel,sum(minutos) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'D' as indice from ordenes where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
             UNION
-            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$periodo."-15' group by dia_trabajo
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,sum(minutos) as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'E' as indice from generacion_demandas where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$periodo."-15' and dia_trabajo<='".$hoy."' group by dia_trabajo
             UNION
-            select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' and dia_incidencia<='".$periodo."-15' group by dia_incidencia
+            select dia_incidencia as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,sum(minutos) as incidencias,count(*) as dias_incidencias,0 as otras,'F' as indice from incidencias where ".$campo_universo." = '".$key_universo."' and lpad(dia_incidencia,7,0) ='".$periodo."' and dia_incidencia<='".$periodo."-15' and dia_incidencia<='".$hoy."' group by dia_incidencia
             UNION
-            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
+            select lpad(created_at,10,0) as dia,0 as interaccion, sum(minutos_funnel) as funnel,sum(minutos_orden) as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,0 as otras,'G' as indice from time_updates where ".$campo_universo." = '".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and created_at<='".$periodo."-15' group by lpad(created_at,10,0)
             UNION
-            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$periodo."-15' group by dia_trabajo
+            select dia_trabajo as dia,0 as interaccion, 0 as funnel,0 as ordenes,0 as demanda,0 as incidencias,0 as dias_incidencias,sum(minutos) as otras,'H' as indice from actividades_extras where ".$campo_universo." = '".$key_universo."' and lpad(dia_trabajo,7,0) ='".$periodo."' and dia_trabajo<='".$periodo."-15' and dia_trabajo<='".$hoy."' group by dia_trabajo
         )as a group by lpad(dia,7,0)
         ";
         //return($sql_tiempos_q1);
@@ -1233,7 +1295,7 @@ class DashboardsController extends Controller
 
             $incidencias_q1=$incidencias_q1+$tiempos->incidencias;
         }
-        $minutos_objetivo_q1=$ejecutivos*$min_diario*($dias_transcurridos->transcurridos>=15?15:$dias_transcurridos->transcurridos)-$incidencias_q1;
+        $minutos_objetivo_q1=$min_diario_ejecutivos*($dias_transcurridos->transcurridos>=15?15:$dias_transcurridos->transcurridos)-$incidencias_q1;
             
         $p_productividad_q1=$minutos_objetivo_q1>0?100*$tiempo_productivo_q1/$minutos_objetivo_q1:0;
         

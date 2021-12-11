@@ -144,7 +144,7 @@
             <div class="w-full pt-2"><span class="text-sm font-bold">Minutos:</span></div>
             <div class="w-full flex flex-row space-x-2">
                 <div class="w-1/4">
-                    <span class="text-xs">Minutos esperados de productividad (Diario)</span><br>
+                    <span class="text-xs">Minutos esperados de productividad por ejecutivo (Diario)</span><br>
                     <input class="w-full rounded p-1 border border-gray-300" type="text" name="min_diario" id="min_diario" value="{{old('min_diario')}}">
                     @error('min_diario')
                       <br><span class="text-xs italic text-red-700 text-xs">{{ $message }}</span>

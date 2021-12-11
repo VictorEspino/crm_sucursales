@@ -16,7 +16,7 @@
                 </div>
                 <div class="w-1/3 flex flex-col text-xl font-semibold">
                     <div class="w-full py-5 flex justify-center">
-                        <span class="">Minutos Objetivo Acumulados {{number_format($minutos_objetivo_acum-$minutos_incidencias_acum,0)}}</span>
+                        <span class="">Minutos Objetivo Acumulados {{number_format(($minutos_objetivo_acum-$minutos_incidencias_acum)>=0?$minutos_objetivo_acum-$minutos_incidencias_acum:0,0)}}</span>
                     </div>
                     <div class="w-full py-5 flex justify-center">
                         <span class="">Minutos Productivos Acumulados {{number_format($minutos_productivos_acum,0)}}</span>
@@ -69,19 +69,50 @@
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->ejecutivos,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format(($detalle->interaccion+$detalle->funnel+$detalle->ordenes+$detalle->demanda+$detalle->otras),0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format($detalle->dias_incidencias,0)}}</td>
-                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>{{number_format(($dias_transcurridos*$detalle->ejecutivos*$minutos_sucursal)-$detalle->incidencias,0)}}</td>
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>
-                    <?php
-                    try{
-                    ?>    
-                        {{number_format(100*($detalle->interaccion+$detalle->funnel+$detalle->ordenes+$detalle->demanda+$detalle->otras)/(($dias_transcurridos*$detalle->ejecutivos*$minutos_sucursal)-$detalle->incidencias),0)}}
-                    <?php
-                    }
-                    catch(\Exception $e)
-                    {
-                        echo 0;
-                    }
-                    ?>
+                       @php
+                           $minutos_objetivo_det=0;
+                           try{
+                               $objetivo_detalle="";
+                               if($origen=='R')
+                               {
+                                $objetivo_detalle=$objetivos_detail->where('udn',$detalle->llave)->first();        
+                                $minutos_objetivo_det=$dias_transcurridos*$objetivo_detalle->min_diario*$objetivo_detalle->ejecutivos-$detalle->incidencias;
+                               }
+                               if($origen=='D')
+                               {
+                                   
+                                $objetivo_detalle=$objetivos_detail->where('region',$detalle->llave)->first(); 
+                                $minutos_objetivo_det=$dias_transcurridos*$objetivo_detalle['min_diario']-$detalle->incidencias;
+                               }
+                               if($origen=='G')
+                               {
+                                   
+                                $objetivo_detalle=$objetivos_detail->where('empleado',$detalle->llave)->first(); 
+                                $minutos_objetivo_det=$dias_transcurridos*$objetivo_detalle['min_diario']-$detalle->incidencias;
+                               }
+                           
+                           echo number_format($minutos_objetivo_det,0);
+                           
+                           }
+                           catch(\Exception $e)
+                           {
+                                echo 0;
+                           }
+                       @endphp
+                    </td>
+                    <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>
+                    @php
+                        try{
+                            $cumplimiento=100*($detalle->interaccion+$detalle->funnel+$detalle->ordenes+$detalle->demanda+$detalle->otras)/($minutos_objetivo_det);
+                        }
+                        catch(\Exception $e)
+                        {$cumplimiento=0;}
+                        echo number_format($cumplimiento<=0?0:$cumplimiento,0);
+                    @endphp
+                        
+                        
+
                     %</td>
                     
                     
@@ -256,7 +287,7 @@ var myChart = new Chart(ctx, {
             foreach($tiempos as $tiempo)
             {
             ?>
-                '{{$minutos_objetivo-$tiempo->incidencias}}',
+                '{{($minutos_objetivo-$tiempo->incidencias)>=0?$minutos_objetivo-$tiempo->incidencias:0}}',
             <?php
             }
             ?>                    

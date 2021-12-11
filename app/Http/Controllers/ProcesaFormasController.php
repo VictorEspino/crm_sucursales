@@ -526,6 +526,9 @@ class ProcesaFormasController extends Controller
             'tipo' => 'required',
             'observaciones' => 'max:255',            
         ]);
+
+        $periodo_afectado=substr($request->dia_incidencia,0,7);
+
         $registro=new Incidencia;      
         $registro->empleado=Auth::user()->empleado;
         $registro->nombre=Auth::user()->name;
@@ -544,6 +547,9 @@ class ProcesaFormasController extends Controller
             catch(\Exception $e)
             {
                 $minutos=360;
+                return(view('mensaje',[ 'estatus'=>'FAIL',
+                                'mensaje'=>'No se puede registrar incidencia ('.$request->dia_incidencia.' - '.$request->tipo.'), es necesario primero registrar los objetivos de la sucursal para el periodo '.$periodo_afectado
+                              ]));
             }
         }
 
@@ -584,7 +590,7 @@ class ProcesaFormasController extends Controller
             'r_con' => 'required|numeric',
             'r_sin' => 'required|numeric',
             'ejecutivos' => 'required|numeric',
-            'min_diario' => 'required|numeric',
+            'min_diario' => 'required|numeric|max:600',
 
         ]);
         $actualizados=Objetivo::where('periodo', $request->periodo)->where('udn',$request->sucursal)
@@ -629,6 +635,12 @@ class ProcesaFormasController extends Controller
             $registro->save();
 
         }
+
+        Incidencia::where('udn',$request->sucursal)
+                    ->whereRaw('lpad(dia_incidencia,7,0)=?',[$request->periodo])
+                    ->update(['minutos'=>$request->min_diario]);
+
+
         return(view('mensaje',[ 'estatus'=>'OK',
                                 'mensaje'=>'La actualizacion de objetivos ('.$request->periodo.') se realizo de manera exitosa!'
                               ]));

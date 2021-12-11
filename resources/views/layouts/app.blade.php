@@ -2,6 +2,8 @@
 $efectividad_visitas=App\Http\Controllers\DashboardsController::gauge("1");
 $efectividad_ordenes=App\Http\Controllers\DashboardsController::gauge("2");
 $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
+$alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
+
 ?>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -121,6 +123,11 @@ $efectividad_intencion=App\Http\Controllers\DashboardsController::gauge("3");
                             {{ $header }}
                     </h2>
                 </div>
+                @if($alert_objetivos=="1")
+                <div class="bg-red-400 p-2 text-base text-white flex justify-end font-bold">
+                    Es necesario cargar objetivos para el periodo actual
+                </div>
+                @endif
             </header>
 
             <!-- Page Content -->
