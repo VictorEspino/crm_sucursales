@@ -97,6 +97,7 @@
             <div class="w-1/5 flex justify-center font-bold"><canvas width="200" height="390" id="g_renovaciones"></canvas></div>
             <div class="w-1/5 flex justify-center font-bold"><canvas width="200" height="390" id="g_rep"></canvas></div>
         </div>
+        @if($origen=="D" || $origen=="R")
         <div class="w-full bg-gray-200 flex flex-col p-3 font-bold text-base">
             Detalles
         </div>
@@ -136,6 +137,7 @@
                 </table>
             </div>
         </div>
+        @endif
     </div>
     
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.js"></script>

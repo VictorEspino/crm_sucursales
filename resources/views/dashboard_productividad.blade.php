@@ -92,7 +92,7 @@
                                 $minutos_objetivo_det=$dias_transcurridos*$objetivo_detalle['min_diario']-$detalle->incidencias;
                                }
                            
-                           echo number_format($minutos_objetivo_det,0);
+                           echo number_format(($minutos_objetivo_det<=0?0:$minutos_objetivo_det),0);
                            
                            }
                            catch(\Exception $e)

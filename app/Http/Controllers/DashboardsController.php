@@ -986,7 +986,13 @@ class DashboardsController extends Controller
                 $objetivos_detail=[];
                 foreach($ejecutivos as $ejecutivo)
                 {
-                    $min_diario_ejecutivo=$objetivo->min_diario;
+                    try{
+                        $min_diario_ejecutivo=$objetivo->min_diario;
+                    }
+                    catch(\Exception $e)
+                    {
+                        $min_diario_ejecutivo=0;
+                    }
                     $objetivos_detail[]=['empleado'=>$ejecutivo->empleado,'min_diario'=>$min_diario_ejecutivo];
                 }
                 $objetivos_detail=collect($objetivos_detail);

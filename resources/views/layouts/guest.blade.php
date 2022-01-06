@@ -28,13 +28,13 @@
         </style>
     </head>
     <body class="body-bg min-h-screen pt-8 md:pt-8 pb-6 px-2 md:px-0" style="font-family:'Lato',sans-serif;">
-    <header class="max-w-lg mx-auto">
-        <center>
-                <image src="{{url('images/bca.jpg') }}" class="w-24 rounded-lg shadow-2xl">
-                </image></center>
+        <header class="max-w-lg mx-auto">
+            <center>
+                    <image src="{{url('images/bca.jpg') }}" class="w-24 rounded-lg shadow-2xl">
+                    </image></center>
 
-                <h1 class="text-xl font-bold text-white text-center">Balance Scorecard</h1>
-            </header>
+                    <h1 class="text-xl font-bold text-white text-center">Balance Scorecard</h1>
+        </header>
 
             {{ $slot }}
 
