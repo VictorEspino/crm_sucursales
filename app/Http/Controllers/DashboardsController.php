@@ -521,6 +521,23 @@ class DashboardsController extends Controller
             ->whereRaw("lpad(created_at,7,0) =?", [$periodo])
             ->groupBy('intencion')
             ->get();
+
+        $sql_diario="select dia,sum(intencion) as intencion,sum(sin_intencion) as sin_intencion from (
+            select lpad(created_at,10,0) as dia,'1' as fuente,count(*) as intencion,0 as sin_intencion from `interaccions` where ".$campo_universo."='".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and intencion=1 group by lpad(created_at,10,0),intencion
+            UNION
+            select lpad(created_at,10,0) as dia,'2' as fuente,0 as intencion,count(*) as sin_intencion from `interaccions` where ".$campo_universo."='".$key_universo."' and lpad(created_at,7,0) ='".$periodo."' and intencion=0 group by lpad(created_at,10,0),intencion
+            UNION
+            select dia,'3' as fuente,0 as intencion,0 as sin_intencion from estatico_dias where periodo='".$periodo."'
+            UNION
+            select dia,'4' as fuente,0 as intencion,0 as sin_intencion from estatico_dias where periodo='".$periodo."'
+            ) as a group by a.dia";
+        $flujo_diario=DB::select(DB::raw(
+                $sql_diario
+            ));
+        $flujo_diario=collect($flujo_diario);
+        //return($flujo_diario);
+        
+        
         //return($query_intencion);
         foreach($query_intencion as $intencion)
         {
@@ -539,6 +556,7 @@ class DashboardsController extends Controller
             $pi=100*$ci/$total;
             $ps=100*$si/$total;
         }
+
         
         $query_tramite_c=Interaccion::select(DB::raw("tramite,count(*) as visitas"))
             ->whereRaw(''.$campo_universo.'=?',$key_universo)
@@ -594,7 +612,8 @@ class DashboardsController extends Controller
                                               'fin_con'=>$query_fin_c,
                                               'tramites_sin'=>$query_tramite_s,
                                               'fin_sin'=>$query_fin_s,
-                                              'details'=>$details
+                                              'details'=>$details,
+                                              'diario'=>$flujo_diario
                                             ]));
     }
     public function dashboard_orden(Request $request)

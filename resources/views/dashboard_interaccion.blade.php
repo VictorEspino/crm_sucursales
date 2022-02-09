@@ -4,11 +4,41 @@
     </x-slot>
     <div class="flex flex-col w-full bg-white text-gray-700 shadow-lg rounded-lg">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
-            <div class="w-full text-lg font-semibold">Indicadores de Interaccion - {{$periodo}}</div>            
+            <div class="w-full text-lg font-semibold">Indicadores de Interaccion - {{$periodo}}</div> 
+            @if(Auth::user()->puesto!='Director')
             <div class="w-full text-2xl text-green-600 font-bold flex justify-end"><a href="/export_interaccion/{{$periodo}}"><i class="far fa-file-excel"></i></a></div>
+            @endif
         @if($nav_origen=='DRILLDOWN')
             <div class="w-full text-sm text-red-700 font-bold"><a href="javascript: window.history.back()"><< Regresar</a></div>
         @endif
+        </div>
+        <div class="w-full rounded-b-lg bg-white p-3 flex flex-row">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="bg-blue-500 border border-gray-400 text-gray-200 font-semibold px-1">Dia</td>
+                        @foreach($diario as $dia)
+                        <td class="bg-blue-500 border border-gray-400 text-gray-200 px-1">{{substr($dia->dia,8,2)}}</td>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td class="bg-gray-200 border border-gray-400 text-gray-700 font-semibold px-1">Con Intencion</td>
+                        @foreach($diario as $dia)
+                        <td class="bg-gray-200 border border-gray-400 text-gray-700 px-1">{{number_format($dia->intencion,0)}}</td>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td class="bg-white border border-gray-400 text-gray-700 font-semibold px-1">Sin Intencion</td>
+                        @foreach($diario as $dia)
+                        <td class="bg-white border border-gray-400 text-gray-700 px-1">{{number_format($dia->sin_intencion,0)}}</td>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td class="bg-gray-500 border border-gray-400 text-gray-200 font-semibold px-1">Total</td>
+                        @foreach($diario as $dia)
+                        <td class="bg-gray-500 border border-gray-400 text-gray-200 px-1">{{number_format($dia->sin_intencion+$dia->intencion,0)}}</td>
+                        @endforeach
+                    </tr>
+                </table>
         </div>
         <div class="w-full rounded-b-lg bg-white p-3 flex flex-col">
             <div class="w-full flex flex-row">
@@ -50,9 +80,8 @@
             </div>
 
         </div>
-        
         <div class="w-full bg-gray-200 p-3 flex flex-col">
-            <div class="w-full text-lg font-semibold">Con Intencion de Compra</div>
+            <div class="w-full text-lg font-semibold">ACUMULADO Con Intencion de Compra</div>
         </div>
     
         <div class="w-full rounded-b-lg bg-white p-3 flex flex-col">
@@ -122,7 +151,7 @@
             </div>
         </div>
         <div class="w-full bg-gray-200 p-3 flex flex-col">
-            <div class="w-full text-lg font-semibold">Sin Intencion de Compra</div>
+            <div class="w-full text-lg font-semibold">ACUMULADO Sin Intencion de Compra</div>
         </div>
         <div class="w-full rounded-b-lg bg-white p-3 flex flex-col">
             <div class="w-full flex flex-row">

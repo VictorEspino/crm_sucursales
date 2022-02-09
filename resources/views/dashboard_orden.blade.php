@@ -5,7 +5,9 @@
     <div class="flex flex-col w-full bg-white text-gray-700 shadow-lg rounded-lg">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
             <div class="w-full text-lg font-semibold">Indicadores de Ordenes - {{$periodo}}</div>
+            @if(Auth::user()->puesto!='Director')
             <div class="w-full text-2xl text-green-600 font-bold flex justify-end"><a href="/export_orden/{{$periodo}}"><i class="far fa-file-excel"></i></a></div>
+            @endif
         @if($nav_origen=='DRILLDOWN')
             <div class="w-full text-sm text-red-700 font-bold"><a href="javascript: window.history.back()"><< Regresar</a></div>
         @endif
