@@ -171,6 +171,8 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
                             <li class="w-full h-full py-3 px-2 border-b border-light-border bg-blue-200">
                                 Rentabilidad
                             </li>
+                            @endif
+                            @if(Auth::user()->puesto=='Regional' || Auth::user()->puesto=='Gerente' || Auth::user()->puesto=='Director')
                             <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('erp_import')?'bg-gray-100':'br-gray-800'}}">
                                 <a href="{{ route('erp_import') }}"
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
@@ -179,6 +181,8 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
                             </li>
+                            @endif
+                            @if(Auth::user()->puesto=='Regional' || Auth::user()->puesto=='Gerente')
                             <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('rentabilidad_gastos')?'bg-gray-100':'br-gray-800'}}">
                                 <a href="{{ route('rentabilidad_gastos') }}"
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
@@ -299,6 +303,14 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
                                     class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
                                     <i class="fas fa-table float-left mx-2"></i>
                                       Revisar Incidencias
+                                    <span><i class="fa fa-angle-right float-right"></i></span>
+                                </a>
+                            </li>
+                            <li class="w-full h-full py-3 px-2 border-b border-light-border {{request()->routeIs('seguimiento_actividades')?'bg-gray-100':'br-gray-800'}}">
+                                <a href="{{ route('seguimiento_actividades') }}"
+                                    class="font-sans font-hairline hover:font-normal text-sm text-nav-item no-underline">
+                                    <i class="fas fa-table float-left mx-2"></i>
+                                      Revisar Actividades
                                     <span><i class="fa fa-angle-right float-right"></i></span>
                                 </a>
                             </li>

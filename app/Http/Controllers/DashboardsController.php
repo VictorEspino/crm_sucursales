@@ -1656,7 +1656,8 @@ class DashboardsController extends Controller
         $gastos=RentabilidadGastos::where('periodo',$id_gastos)
                         ->select(DB::raw('sum(gastos_fijos) as g_f,sum(gastos_indirectos) as g_i'));
         $erp=ErpTransaccion::whereRaw('lpad(fecha,7,0)=?',$periodo)
-                        ->select(DB::raw('sum(ingreso) as ingreso,sum(costo_venta) as c_v'));
+                        ->select(DB::raw('sum(ingreso) as ingreso,sum(costo_venta) as c_v'))
+                        ->where('direccion','SUCURSALES');
         $activaciones=[];
         $renovaciones=[];
         $aep=[];

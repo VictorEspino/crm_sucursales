@@ -8,6 +8,7 @@ use App\Models\Objetivo;
 use App\Models\Sucursal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\ActividadesExtra;
 
 use Illuminate\Http\Request;
 
@@ -191,5 +192,45 @@ class ProcesaSeguimientoController extends Controller
         ";
         $registros=DB::select(DB::raw($sql_registros));
         return(view('objetivos_review',['registros'=>$registros]));
+    }
+
+    public function seguimiento_actividades(Request $request)
+    {
+        $campo_universo='';
+        $key_universo='';
+    
+        if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
+        {
+            $campo_universo='empleado';
+            $key_universo=Auth::user()->empleado;
+        }
+        if(Auth::user()->puesto=='Gerente')
+        {
+            $campo_universo='udn';
+            $key_universo=Auth::user()->udn;
+        }
+        if(Auth::user()->puesto=='Regional')
+        {
+            $campo_universo='region';
+            $key_universo=Auth::user()->pdv;
+        }
+
+
+        if(isset($_GET['query']))
+        {
+            $registros=ActividadesExtra::where($campo_universo,$key_universo)
+                                ->where('dia_trabajo',$_GET["query"])
+                                ->orderBy('dia_trabajo','desc')
+                                ->paginate(10);
+            $registros->appends($request->all());
+            return(view('seguimiento_actividades',['registros'=>$registros,'query'=>$_GET['query']]));
+        }
+        else
+        {
+            $registros=ActividadesExtra::where($campo_universo,$key_universo)
+                                ->orderBy('dia_trabajo','desc')
+                                ->paginate(10);
+            return(view('seguimiento_actividades',['registros'=>$registros,'query'=>'']));
+        }
     }
 }

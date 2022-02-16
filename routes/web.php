@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardComparativoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\ComentariosController;
+use App\Http\Controllers\DashboardSocios;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,7 @@ Route::get('/seguimiento_funnel', [ProcesaSeguimientoController::class,'seguimie
 Route::get('/seguimiento_funnel_calendario', [ProcesaSeguimientoController::class,'seguimiento_funnel_calendario'])->middleware('auth')->name('seguimiento_funnel_calendario');
 Route::get('/seguimiento_orden', [ProcesaSeguimientoController::class,'seguimiento_orden'])->middleware('auth')->name('seguimiento_orden');
 Route::get('/seguimiento_incidencias', [ProcesaSeguimientoController::class,'seguimiento_incidencias'])->middleware('auth')->name('seguimiento_incidencias');
+Route::get('/seguimiento_actividades', [ProcesaSeguimientoController::class,'seguimiento_actividades'])->middleware('auth')->name('seguimiento_actividades');
 
 Route::get('/funnel_detalles/{id}', [ProcesaFormasController::class,'funnel_detalles'])->middleware('auth')->name('funnel_detalles');
 
@@ -94,10 +96,12 @@ Route::get('/dashboard_comparativo/{periodo}/{tipo}/{key}/{value}', [DashboardCo
 
 Route::get('/export_interaccion/{periodo}', [ExportController::class,'export_interaccion'])->middleware('auth');
 Route::get('/export_orden/{periodo}', [ExportController::class,'export_orden'])->middleware('auth');
+Route::get('/export_demanda/{periodo}', [ExportController::class,'export_demanda'])->middleware('auth');
 
 Route::get('/incidencia_nuevo', function () {return view('incidencia_nuevo');})->middleware('auth')->name('incidencia_nuevo');
 Route::post('/incidencia_nuevo', [ProcesaFormasController::class,'incidencia_nuevo'])->middleware('auth')->name('incidencia_nuevo');
 Route::post('/incidencia_borrar', [ProcesaFormasController::class,'incidencia_borrar'])->middleware('auth');
+Route::post('/actividad_borrar', [ProcesaFormasController::class,'actividad_borrar'])->middleware('auth');
 
 Route::get('/actividad_extra_nuevo', function () {return view('actividad_extra_nuevo');})->middleware('auth')->name('actividad_extra_nuevo');
 Route::post('/actividad_extra_nuevo', [ProcesaFormasController::class,'actividad_extra_nuevo'])->middleware('auth')->name('actividad_extra_nuevo');
@@ -117,3 +121,8 @@ Route::post('/rentabilidad_gastos',[ExcelController::class,'gastos_import'])->mi
 
 Route::get('/comentarios', [ComentariosController::class,'mostrar_comentarios'])->middleware('auth')->name('comentarios');
 Route::post('/comentarios', [ComentariosController::class,'save_comentarios'])->middleware('auth')->name('comentarios');
+
+//SOCIOS COMERCIALES
+
+Route::get('/socios_diario/{periodo}', [DashboardSocios::class,'diario'])->middleware('auth')->name('socios_diario');
+Route::get('/socios_comparativo/{periodo}', [DashboardSocios::class,'comparativo'])->middleware('auth')->name('socios_comparativo');

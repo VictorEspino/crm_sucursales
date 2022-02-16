@@ -668,4 +668,9 @@ class ProcesaFormasController extends Controller
                                 'mensaje'=>'El registro de la actividad ('.$request->dia_trabajo.' - '.$request->tipo.') se realizo de manera exitosa!'
                               ]));
     }
+    public function actividad_borrar(Request $request)
+    {
+        ActividadesExtra::find($request->id)->delete();
+        return;
+    }
 }

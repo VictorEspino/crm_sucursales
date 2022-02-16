@@ -30,6 +30,12 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     {
 
         $resultado_rentabilidad=$this->getRentabilidad($row['tipo'],$row['importe']);
+        $udn=0;
+        try{
+        $udn=$this->sucursales[$row['almacen']];
+        }
+        catch(\Exception $e)
+        {;}
 
 
         return new ErpTransaccion([
@@ -38,20 +44,21 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             'fecha'=>$row['fecha'],
             'region'=>$row['region'],
             'pdv'=>$row['almacen'],
-            'udn'=>$this->sucursales[$row['almacen']],
+            'udn'=>$udn,
             'tipo'=>$row['tipo'],
             'importe'=>$row['importe'],
             'ingreso'=>$resultado_rentabilidad['ingreso'],
             'costo_venta'=>$resultado_rentabilidad['costo'],
             'bracket'=>$resultado_rentabilidad['bracket'],
             'tipo_estandar'=>$resultado_rentabilidad['tipo_estandar'],
-            'descripcion'=>$row['descripcion'],
-            'cliente'=>$row['cliente'],
+            'descripcion'=>substr($row['descripcion'],0,254),
+            'cliente'=>substr($row['cliente'],0,254),
             'dn'=>$row['numero_dn'],
             'servicio'=>$row['servicio'],
             'producto'=>$row['producto'],
             'carga_id'=>$this->carga_id,
             'empleado_carga'=>Auth::user()->empleado,
+            'direccion'=>Auth::user()->direccion,
         ]);
     }
     public function rules(): array
@@ -59,7 +66,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         return [
             '*.fecha' => ['required'],
             '*.region' => ['required'],
-            '*.almacen' => ['required','exists:sucursals,pdv'],
+            '*.almacen' => ['required','exclude_if:region,SOCIO COMERCIAL|exists:sucursals,pdv'],
             '*.tipo' => ['required'],
             '*.importe' => ['required'],
         ];
@@ -144,6 +151,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($importe>=2885 && $importe<=4184) {return(21);}
         if($importe>=4185 && $importe<=5504) {return(22);}
         if($importe>=5505 && $importe<=20000) {return(23);}
+        return(0);
     }
     private function getIngreso_transaccion($tipo,$bracket)
     {
@@ -255,18 +263,21 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             if($bracket==22){return(10250);}
             if($bracket==23){return(13500);}
         }
+        return(0);
     }
     private function getBracket_addon($importe)
     {
         if($importe>=0 && $importe<=99) {return(1);}
         if($importe>=100 && $importe<=199) {return(2);}
         if($importe>=200 && $importe<=20000) {return(3);}
+        return(0);
     }
     private function getIngreso_addon($tipo,$bracket)
     {
         if($bracket==1){return(129.31);}
         if($bracket==2){return(258.62);}
         if($bracket==3){return(517.24);}
+        return(0);
     }
     private function getBracket_seguro($importe)
     {
@@ -276,6 +287,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($importe>=179 && $importe<=198) {return(4);}
         if($importe>=199 && $importe<=238) {return(5);}
         if($importe>=239 && $importe<=20000) {return(6);}
+        return(0);
     }
     private function getIngreso_seguro($tipo,$bracket)
     {
@@ -286,6 +298,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($bracket==4){return(462.93);}
         if($bracket==5){return(514.66);}
         if($bracket==6){return(618.10);}
+        return(0);
     }
     private function getCosto_transaccion($tipo,$bracket)
     {
@@ -397,6 +410,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             if($bracket==22){return(1764);}
             if($bracket==23){return(2326);}
         }
+        return(0);
     }
     private function getCosto_seguro($tipo,$bracket)
     {
@@ -407,11 +421,13 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($bracket==4){return(87);}
         if($bracket==5){return(87);}
         if($bracket==6){return(87);}
+        return(0);
     }
     private function getCosto_addon($tipo,$bracket)
     {
         if($bracket==1){return(21.55);}
         if($bracket==2){return(43.10);}
         if($bracket==3){return(86.21);}
+        return(0);
     }
 }

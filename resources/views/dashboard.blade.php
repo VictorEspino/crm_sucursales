@@ -84,6 +84,31 @@
                 @endif
             </div>
         </div>
+        @if(Auth::user()->puesto=='Director')
+        <div class="py-3 w-full bg-gray-200 text-base px-3">
+            Socios Comerciales/Empresarial
+        </div>
+        <div class="w-full bg-white pb-10">
+            <div class="w-full flex flex-row">
+                <div class="w-1/3 flex flex-col">
+                    <div class="w-full pt-5 flex justify-center text-5xl font-semibold text-red-400">                        
+                        <a href="javascript:socios_comparativo()"><i class="fas fa-atlas"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Dasboard Comparativo
+                    </div>
+                </div>
+                <div class="w-1/3 flex flex-col">
+                    <div class="w-full pt-5 flex justify-center text-5xl font-semibold text-yellow-500">
+                        <a href="javascript:socios_diario()"><i class="far fa-calendar-alt"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Avance Periodo
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
     <script>
         function efectividad()
@@ -130,6 +155,16 @@
         {
             periodo=document.getElementById("periodo").value;
             document.location.href="/dashboard_comparativo/"+periodo;
+        }
+        function socios_comparativo()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/socios_comparativo/"+periodo;
+        }
+        function socios_diario()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/socios_diario/"+periodo;
         }
     </script>
 </x-app-layout>
