@@ -226,6 +226,11 @@ class DashboardComparativoController extends Controller
             $rentabilidad_año_actual[]=['periodo'=>$periodo_año_actual->periodo,'rentabilidad'=>$rentabilidad_periodo_actual];
         }
 
+        $ultimo_dia=ErpTransaccion::select(DB::raw('max(fecha) as ultimo'))
+                                    ->where('direccion','SUCURSALES')
+                                    ->get()
+                                    ->first()
+                                    ->ultimo;
 
         return(view('dashboard_comparativo',['periodo'=>$periodo,
                                             'nav_origen'=>$nav_origen,
@@ -242,7 +247,8 @@ class DashboardComparativoController extends Controller
                                             'flujo_año_actual'=>$flujo_año_actual,
                                             'lista_dd'=>$lista_dd,
                                             'rentabilidad_año_anterior'=>$rentabilidad_año_anterior,
-                                            'rentabilidad_año_actual'=>$rentabilidad_año_actual
+                                            'rentabilidad_año_actual'=>$rentabilidad_año_actual,
+                                            'ultimo_dia'=>$ultimo_dia
                                         ]));
     }
     private function getRentabilidad($origen,$periodo,$filtro)

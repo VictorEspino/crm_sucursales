@@ -10,6 +10,7 @@
         @if($nav_origen=='DRILLDOWN')
             <div class="w-full text-sm text-red-700 font-bold"><a href="javascript: window.history.back()"><< Regresar</a></div>
         @endif
+            <div class="w-full text-sm font-semibold text-red-400">Ultimo dia de información : {{$ultimo_dia}}</div>
         </div> <!--FIN ENCABEZADO-->
         <div class="w-full  bg-white rounded-b-lg flex flex-wrap space-y-10">
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Activaciones</div>

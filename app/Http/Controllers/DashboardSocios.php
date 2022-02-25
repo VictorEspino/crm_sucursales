@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\EstaticoDias;
+use App\Models\ErpTransaccion;
 
 class DashboardSocios extends Controller
 {
@@ -81,6 +82,12 @@ class DashboardSocios extends Controller
                                             ->get()
                                             ->first();
 
+        $ultimo_dia=ErpTransaccion::select(DB::raw('max(fecha) as ultimo'))
+                                            ->where('direccion','SOCIOS')
+                                            ->get()
+                                            ->first()
+                                            ->ultimo;
+
         return view('dashboard_socios_diario',[
                                                 'periodo'=>$periodo,
                                                 'transcurridos'=>$dias_transcurridos->transcurridos,
@@ -97,7 +104,7 @@ class DashboardSocios extends Controller
                                                 'ren_empresarial_l'=>$ren_empresarial_l,
                                                 'act_empresarial_m'=>$act_empresarial_m,
                                                 'ren_empresarial_m'=>$ren_empresarial_m,
-
+                                                'ultimo_dia'=>$ultimo_dia
                                             ]);
     }
     public function comparativo(Request $request)
@@ -268,6 +275,13 @@ class DashboardSocios extends Controller
         $meses['10']='Octubre';
         $meses['11']='Noviembre';
         $meses['12']='Diciembre';
+
+        $ultimo_dia=ErpTransaccion::select(DB::raw('max(fecha) as ultimo'))
+                                            ->where('direccion','SOCIOS')
+                                            ->get()
+                                            ->first()
+                                            ->ultimo;
+
         return view('dashboard_socios_comparativo',[
                                 'periodo'=>$periodo,
                                 'meses'=>$meses,
@@ -284,7 +298,8 @@ class DashboardSocios extends Controller
                                 'contribucion_ambas'=>$cont_ambas,
                                 'contribucion_ambas_anterior'=>$cont_ambas_anterior,
                                 'contribucion_ambas_array'=>$cont_ambas_array,
-                                'contribucion_ambas_anterior_array'=>$cont_ambas_anterior_array
+                                'contribucion_ambas_anterior_array'=>$cont_ambas_anterior_array,
+                                'ultimo_dia'=>$ultimo_dia
         ]);
     }
 }

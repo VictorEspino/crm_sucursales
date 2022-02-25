@@ -126,3 +126,5 @@ Route::post('/comentarios', [ComentariosController::class,'save_comentarios'])->
 
 Route::get('/socios_diario/{periodo}', [DashboardSocios::class,'diario'])->middleware('auth')->name('socios_diario');
 Route::get('/socios_comparativo/{periodo}', [DashboardSocios::class,'comparativo'])->middleware('auth')->name('socios_comparativo');
+
+Route::get('/export_rentabilidad/{periodo}', [DashboardsController::class,'export_rentabilidad'])->middleware('auth')->name('export_rentabilidad');

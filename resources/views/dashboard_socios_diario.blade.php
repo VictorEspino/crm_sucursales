@@ -8,6 +8,7 @@
             <div class="w-full text-lg font-semibold">Medicion diaria - {{$periodo}}</div>
             <div class="px-4 text-sm font-semibold">Dias transcurridos: {{$transcurridos}}</div>
             <div class="px-4 text-sm font-semibold">Dias totales mes: {{$dias_total}}</div>
+            <div class="w-full text-sm font-semibold text-red-400">Ultimo dia de información : {{$ultimo_dia}}</div>
         </div> <!--FIN ENCABEZADO-->
         <div class="w-full bg-white rounded-b-lg flex flex-wrap space-y-3">
             <div class="w-full flex justify-center pt-5">

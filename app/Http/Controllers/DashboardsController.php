@@ -1803,4 +1803,73 @@ class DashboardsController extends Controller
              ";
         return($sql);
     }
+    public function export_rentabilidad(Request $request)
+    {
+        $periodo=$request->periodo;
+        $periodo_gastos=RentabilidadPeriodosGastos::withCount('detalles')
+                                        ->where('inicio_vigencia','<=',$periodo.'-01')
+                                        ->where('fin_vigencia','>=',$periodo.'-01')
+                                        ->get()
+                                        ->first();
+        $id_gastos=$periodo_gastos->id;
+        $titulo_gastos=$periodo_gastos->descripcion;
+        //VERIFICA QUE YA ESTAN CARGADOS SUS PARAMETROS
+        if($periodo_gastos->detalles_count==0)
+        {
+            $ultimo_conocido=RentabilidadGastos::select(DB::raw('max(periodo) as id'))
+                                                ->get()
+                                                ->first();
+            $periodo_alterno=RentabilidadPeriodosGastos::find($ultimo_conocido->id);
+            $id_gastos=$ultimo_conocido->id;
+            $titulo_gastos=$periodo_alterno->descripcion;
+            $consistencia=false;
+            //return($ultimo_conocido);
+        }
+        else{
+            $consistencia=true;
+        }
+        
+        $gastos_fijos=0;
+        $gastos_indirectos=0;
+        $ingresos=0;
+        $costos_venta=0;
+        $gastos=RentabilidadGastos::where('periodo',$id_gastos)
+                        ->select(DB::raw('sum(gastos_fijos) as g_f,sum(gastos_indirectos) as g_i'));
+        $erp=ErpTransaccion::whereRaw('lpad(fecha,7,0)=?',$periodo)
+                        ->select(DB::raw('sum(ingreso) as ingreso,sum(costo_venta) as c_v'))
+                        ->where('direccion','SUCURSALES');
+        $gastos=$gastos->get()->first();
+        $erp=$erp->get()->first(); 
+        
+        $ingresos=$erp->ingreso;
+        $costos_venta=$erp->c_v;
+        $gastos_fijos=$gastos->g_f;
+        $gastos_indirectos=$gastos->g_i;
+        $sum_gastos=$costos_venta+$gastos_fijos+$gastos_indirectos;
+        $porc_rentabilidad=$sum_gastos>0?100*$ingresos/$sum_gastos:0;
+
+
+
+        $detalles_regiones=DB::select(DB::raw($this->getSQL_detalles('D','',$id_gastos,$periodo)));
+        $detalles_centro=DB::select(DB::raw($this->getSQL_detalles('R','CENTRO',$id_gastos,$periodo)));
+        $detalles_norte=DB::select(DB::raw($this->getSQL_detalles('R','NORTE',$id_gastos,$periodo)));
+        $detalles_sur=DB::select(DB::raw($this->getSQL_detalles('R','SUR',$id_gastos,$periodo)));
+
+        $sucursales=Sucursal::all()->pluck('pdv','udn');
+    
+        return(view('export_rentabilidad',[
+                                            'ingresos'=>$ingresos,
+                                            'costos_venta'=>$costos_venta,
+                                            'gastos_fijos'=>$gastos_fijos,
+                                            'gastos_indirectos'=>$gastos_indirectos,
+                                            'gastos'=>$sum_gastos,
+                                            'porc_rentabilidad'=>$porc_rentabilidad,
+                                            'detalles_regiones'=>$detalles_regiones,
+                                            'detalles_centro'=>$detalles_centro,
+                                            'detalles_norte'=>$detalles_norte,
+                                            'detalles_sur'=>$detalles_sur,
+                                            'sucursales'=>$sucursales
+                                        ]));
+        return($detalles_sur);
+    }
 }

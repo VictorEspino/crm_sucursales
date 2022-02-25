@@ -5,6 +5,7 @@
     <div class="flex flex-col w-full  bg-white text-gray-700 shadow-lg rounded-lg">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
             <div class="w-full text-lg font-semibold">Socios comerciales - {{$periodo}}</div>
+            <div class="w-full text-sm font-semibold text-red-400">Ultimo dia de información : {{$ultimo_dia}}</div>
         </div> <!--FIN ENCABEZADO-->
         <div class="w-full  bg-white rounded-b-lg flex flex-wrap space-y-10">
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Contribucion<br />Socios Comerciales</div>
