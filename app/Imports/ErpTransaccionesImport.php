@@ -16,6 +16,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     use Importable;
     private $carga_id;
     private $sucursales;
+    private $regiones;
 
     public function setCargaId($id)
     {
@@ -25,24 +26,29 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     {
         $this->sucursales=$sucursales;
     }
+    public function setRegiones($regiones)
+    {
+        $this->regiones=$regiones;
+    }
 
     public function model(array $row)
     {
 
         $resultado_rentabilidad=$this->getRentabilidad($row['tipo'],$row['importe']);
         $udn=0;
-        try{
-        $udn=$this->sucursales[$row['almacen']];
+        $region='SOCIO COMERCIAL';
+        $direccion='SOCIOS';
+        if($row['region']!='SOCIO COMERCIAL')
+        {
+            $udn=$this->sucursales[$row['almacen']];
+            $region=$this->regiones[$row['almacen']];
+            $direccion='SUCURSALES';
         }
-        catch(\Exception $e)
-        {;}
-
-
         return new ErpTransaccion([
             'no_venta'=>$row['venta'],
             'empleado'=>$row['empleado'],
             'fecha'=>$row['fecha'],
-            'region'=>$row['region'],
+            'region'=>$region,
             'pdv'=>$row['almacen'],
             'udn'=>$udn,
             'tipo'=>$row['tipo'],
@@ -58,7 +64,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             'producto'=>$row['producto'],
             'carga_id'=>$this->carga_id,
             'empleado_carga'=>Auth::user()->empleado,
-            'direccion'=>Auth::user()->direccion,
+            'direccion'=>$direccion,
         ]);
     }
     public function rules(): array
@@ -66,7 +72,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         return [
             '*.fecha' => ['required'],
             '*.region' => ['required'],
-            '*.almacen' => ['required','exclude_if:region,SOCIO COMERCIAL|exists:sucursals,pdv'],
+            '*.almacen' => ['required','exclude_if:*.region,SOCIO COMERCIAL','exists:sucursals,pdv'],
             '*.tipo' => ['required'],
             '*.importe' => ['required'],
         ];
@@ -128,29 +134,29 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     }
     private function getBracket_transaccion($importe)
     {
-        if($importe>=0 && $importe<=258) {return(1);}
-        if($importe>=259 && $importe<=264) {return(2);}
-        if($importe>=265 && $importe<=324) {return(3);}
-        if($importe>=325 && $importe<=368) {return(4);}
-        if($importe>=369 && $importe<=434) {return(5);}
-        if($importe>=435 && $importe<=498) {return(6);}
-        if($importe>=499 && $importe<=534) {return(7);}
-        if($importe>=535 && $importe<=548) {return(8);}
-        if($importe>=549 && $importe<=634) {return(9);}
-        if($importe>=635 && $importe<=648) {return(10);}
-        if($importe>=649 && $importe<=744) {return(11);}
-        if($importe>=745 && $importe<=748) {return(12);}
-        if($importe>=749 && $importe<=844) {return(13);}
-        if($importe>=845 && $importe<=848) {return(14);}
-        if($importe>=849 && $importe<=998) {return(15);}
-        if($importe>=999 && $importe<=1044) {return(16);}
-        if($importe>=1045 && $importe<=1398) {return(17);}
-        if($importe>=1399 && $importe<=1564) {return(18);}
-        if($importe>=1565 && $importe<=2264) {return(19);}
-        if($importe>=2265 && $importe<=2884) {return(20);}
-        if($importe>=2885 && $importe<=4184) {return(21);}
-        if($importe>=4185 && $importe<=5504) {return(22);}
-        if($importe>=5505 && $importe<=20000) {return(23);}
+        if($importe>=0 && $importe<=258.999999) {return(1);}
+        if($importe>=259 && $importe<=264.999999) {return(2);}
+        if($importe>=265 && $importe<=324.999999) {return(3);}
+        if($importe>=325 && $importe<=368.999999) {return(4);}
+        if($importe>=369 && $importe<=434.999999) {return(5);}
+        if($importe>=435 && $importe<=498.999999) {return(6);}
+        if($importe>=499 && $importe<=534.999999) {return(7);}
+        if($importe>=535 && $importe<=548.999999) {return(8);}
+        if($importe>=549 && $importe<=634.999999) {return(9);}
+        if($importe>=635 && $importe<=648.999999) {return(10);}
+        if($importe>=649 && $importe<=744.999999) {return(11);}
+        if($importe>=745 && $importe<=748.999999) {return(12);}
+        if($importe>=749 && $importe<=844.999999) {return(13);}
+        if($importe>=845 && $importe<=848.999999) {return(14);}
+        if($importe>=849 && $importe<=998.999999) {return(15);}
+        if($importe>=999 && $importe<=1044.999999) {return(16);}
+        if($importe>=1045 && $importe<=1398.999999) {return(17);}
+        if($importe>=1399 && $importe<=1564.999999) {return(18);}
+        if($importe>=1565 && $importe<=2264.999999) {return(19);}
+        if($importe>=2265 && $importe<=2884.999999) {return(20);}
+        if($importe>=2885 && $importe<=4184.999999) {return(21);}
+        if($importe>=4185 && $importe<=5504.999999) {return(22);}
+        if($importe>=5505 && $importe<=20000.999999) {return(23);}
         return(0);
     }
     private function getIngreso_transaccion($tipo,$bracket)

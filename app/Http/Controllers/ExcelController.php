@@ -20,7 +20,10 @@ class ExcelController extends Controller
             ]);
         $file=$request->file('file');
 
-        $sucursales=Sucursal::select('udn','pdv')->get()->pluck('udn','pdv');
+        $suc=Sucursal::select('udn','pdv','region')->get();
+
+        $sucursales=$suc->pluck('udn','pdv');
+        $regiones=$suc->pluck('region','pdv');
 
         $bytes = random_bytes(5);
         $carga_id=bin2hex($bytes);
@@ -30,6 +33,7 @@ class ExcelController extends Controller
         $import=new ErpTransaccionesImport;
         $import->setCargaId($carga_id);
         $import->setSucursales($sucursales);
+        $import->setRegiones($regiones);
         try{
         $import->import($file);
         }

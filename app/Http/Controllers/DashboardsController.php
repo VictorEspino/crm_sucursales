@@ -1765,10 +1765,11 @@ class DashboardsController extends Controller
             select bracket,0 as n,0 as ingreso,0 as c_v from brackets where tipo='".$tipo."'
             UNION
             select bracket,count(*),sum(ingreso) as ingreso,sum(costo_venta) c_v 
-            from erp_transaccions 
+            from erp_transaccions
             where 
             lpad(fecha,7,0)='".$periodo."' and 
-            tipo_estandar='".$tipo_consulta."' ".$filtro_adicional." 
+            tipo_estandar='".$tipo_consulta."' ".$filtro_adicional." and
+            direccion='SUCURSALES'
             group by bracket) as a 
             group by bracket";
         return($sql);
@@ -1796,7 +1797,7 @@ class DashboardsController extends Controller
             select ".$llave." as llave,sum(gastos_fijos) as gastos_fijos,sum(gastos_indirectos) as gastos_indirectos,sum(ingresos) as ingresos, sum(c_v) as c_v,(100*sum(ingresos)/sum(gastos_fijos+gastos_indirectos+c_v)) as rentabilidad from(
             select ".$llave.",gastos_fijos,gastos_indirectos,0 as ingresos, 0 as c_v from rentabilidad_gastos where periodo=".$periodo_gastos."".$filtro_adicional."  
             UNION
-            select ".$llave." as llave,0 as gastos_fijos,0 as gastos_indirectos,sum(ingreso) as ingresos, sum(costo_venta) as c_v from erp_transaccions where lpad(fecha,7,0)='".$periodo_transacciones."'".$filtro_adicional." group by udn,region
+            select ".$llave." as llave,0 as gastos_fijos,0 as gastos_indirectos,sum(ingreso) as ingresos, sum(costo_venta) as c_v from erp_transaccions where lpad(fecha,7,0)='".$periodo_transacciones."'".$filtro_adicional." and direccion='SUCURSALES' group by udn,region
                 ) as a group by a.".$llave."
                 )as a order by rentabilidad desc;
              ";

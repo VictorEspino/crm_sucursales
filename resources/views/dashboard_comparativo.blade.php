@@ -17,7 +17,7 @@
                 <div class="w-full flex flex-col">
                     <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones</span></div>
                     <div class="w-full">
-                    <canvas id="myChart" width="200" height="300"></canvas>
+                    <canvas id="chartActivaciones" width="200" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -26,31 +26,38 @@
                     <table>
                         <tr class="bg-blue-700 text-white rounder-t-xl">
                             <td class="rounded-tl-xl"></td>
-                            <td class="py-2 rounded-tr-xl" colspan=3><center>YTD</td>                            
+                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                            <td class="py-2 px-3"><center>{{$año}}</td>
+                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
                         </tr>
-                        <tr class="bg-blue-700 text-white">
-                            <td class=""></td>
-                            <td class="py-2 px-3"><center>2020</td>
-                            <td class="py-2 px-3"><center>2021</td>
-                            <td class="py-2 px-3"><center>%var</td>
-                        </tr>
+                        @php
+                            $ytd_ant=0;
+                            $ytd_act=0;
+                        @endphp
+                        @foreach($datos_año_anterior_array as $index=>$historico)
+                        @php
+                          try{
+                            $dato_mes=$datos_año_array[$index]['act']+$datos_año_array[$index]['aep'];
+                            $ytd_ant=$ytd_ant+$historico['act']+$historico['aep'];
+                            $ytd_act=$ytd_act+$dato_mes;
+                          }
+                          catch(\Exception $e)
+                          {
+                              $dato_mes=0;
+                          }
+                        @endphp
                         <tr class="">
-                            <td class="py-2 px-5 border">Activaciones</td>
-                            <td class="py-2 px-3 border"><center>33,256</td>
-                            <td class="py-2 px-3 border"><center>35,825</td>
-                            <td class="py-2 px-3 border"><center>+7%</td>
+                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($historico['act']+$historico['aep'],0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{($historico['act']+$historico['aep']>0)?number_format(100*$dato_mes/($historico['act']+$historico['aep'])-100,0):0}}%</td>
                         </tr>
-                        <tr class="">
-                            <td class="py-2 px-5 border">CON Equipo</td>
-                            <td class="py-2 px-3 border"><center>15,284</td>
-                            <td class="py-2 px-3 border"><center>12,655</td>
-                            <td class="py-2 px-3 border"><center>-18%</td>
-                        </tr>
-                        <tr class="">
-                            <td class="py-2 px-5 border">SIN Equipo</td>
-                            <td class="py-2 px-3 border"><center>19,172</td>
-                            <td class="py-2 px-3 border"><center>19,170</td>
-                            <td class="py-2 px-3 border"><center>0%</td>
+                        @endforeach
+                        <tr class="font-bold bg-gray-200">
+                            <td class="text-xs px-5 border">YTD</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
                         </tr>
                     </table>
                 </div>
@@ -58,13 +65,13 @@
             <div class="w-1/2 p-4 flex flex-col">
                 <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones CON equipo</span></div>
                     <div class="w-full">
-                    <canvas id="myChart2" width="200" height="300"></canvas>
+                    <canvas id="chartActivacionesCE" width="200" height="300"></canvas>
                     </div>
             </div>
             <div class="w-1/2 p-4">
                 <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones SIN equipo</span></div>
                     <div class="w-full">
-                    <canvas id="myChart3" width="200" height="300"></canvas>
+                    <canvas id="chartActivacionesSE" width="200" height="300"></canvas>
                     </div>
             </div>
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Renovaciones</div>
@@ -72,7 +79,7 @@
                 <div class="w-full flex flex-col">
                     <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones</span></div>
                     <div class="w-full">
-                    <canvas id="myChart4" width="200" height="300"></canvas>
+                    <canvas id="chartRenovaciones" width="200" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -81,31 +88,38 @@
                     <table>
                         <tr class="bg-blue-700 text-white rounder-t-xl">
                             <td class="rounded-tl-xl"></td>
-                            <td class="py-2 rounded-tr-xl" colspan=3><center>YTD</td>                            
+                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                            <td class="py-2 px-3"><center>{{$año}}</td>
+                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
                         </tr>
-                        <tr class="bg-blue-700 text-white">
-                            <td class=""></td>
-                            <td class="py-2 px-3"><center>2020</td>
-                            <td class="py-2 px-3"><center>2021</td>
-                            <td class="py-2 px-3"><center>%var</td>
-                        </tr>
+                        @php
+                            $ytd_ant=0;
+                            $ytd_act=0;
+                        @endphp
+                        @foreach($datos_año_anterior_array as $index=>$historico)
+                        @php
+                          try{
+                            $dato_mes=$datos_año_array[$index]['ren']+$datos_año_array[$index]['rep'];
+                            $ytd_ant=$ytd_ant+$historico['ren']+$historico['rep'];
+                            $ytd_act=$ytd_act+$dato_mes;
+                          }
+                          catch(\Exception $e)
+                          {
+                              $dato_mes=0;
+                          }
+                        @endphp
                         <tr class="">
-                            <td class="py-2 px-5 border">Renovaciones</td>
-                            <td class="py-2 px-3 border"><center>28,561</td>
-                            <td class="py-2 px-3 border"><center>24,528</td>
-                            <td class="py-2 px-3 border"><center>-15%</td>
+                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($historico['ren']+$historico['rep'],0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{($historico['ren']+$historico['rep']>0)?number_format(100*$dato_mes/($historico['ren']+$historico['rep'])-100,0):0}}%</td>
                         </tr>
-                        <tr class="">
-                            <td class="py-2 px-5 border">CON Equipo</td>
-                            <td class="py-2 px-3 border"><center>17,881</td>
-                            <td class="py-2 px-3 border"><center>12,655</td>
-                            <td class="py-2 px-3 border"><center>-30%</td>
-                        </tr>
-                        <tr class="">
-                            <td class="py-2 px-5 border">SIN Equipo</td>
-                            <td class="py-2 px-3 border"><center>10,680</td>
-                            <td class="py-2 px-3 border"><center>11,863</td>
-                            <td class="py-2 px-3 border"><center>+11%</td>
+                        @endforeach
+                        <tr class="font-bold bg-gray-200">
+                            <td class="text-xs px-5 border">YTD</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
                         </tr>
                     </table>
                 </div>
@@ -113,13 +127,13 @@
             <div class="w-1/2 p-4 flex flex-col">
                 <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones CON equipo</span></div>
                     <div class="w-full">
-                    <canvas id="myChart5" width="200" height="300"></canvas>
+                    <canvas id="chartRenovacionesCE" width="200" height="300"></canvas>
                     </div>
             </div>
             <div class="w-1/2 p-4">
                 <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones SIN equipo</span></div>
                     <div class="w-full">
-                    <canvas id="myChart6" width="200" height="300"></canvas>
+                    <canvas id="chartRenovacionesSE" width="200" height="300"></canvas>
                     </div>
             </div>
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Rentabilidad</div>
@@ -127,7 +141,7 @@
                 <div class="w-full flex flex-col">
                     <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Rentabilidad</span></div>
                     <div class="w-full">
-                    <canvas id="myChart7" width="200" height="300"></canvas>
+                    <canvas id="chartRentabilidad" width="200" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -136,20 +150,31 @@
                     <table>
                         <tr class="bg-blue-700 text-white rounder-t-xl">
                             <td class="rounded-tl-xl"></td>
-                            <td class="py-2 rounded-tr-xl" colspan=3><center>YTD</td>                            
+                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                            <td class="py-2 px-3"><center>{{$año}}</td>
+                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
                         </tr>
-                        <tr class="bg-blue-700 text-white">
-                            <td class=""></td>
-                            <td class="py-2 px-3"><center>2020</td>
-                            <td class="py-2 px-3"><center>2021</td>
-                            <td class="py-2 px-3"><center>%var</td>
-                        </tr>
+                        @php
+                            $ytd_ant=0;
+                            $ytd_act=0;
+                        @endphp
+                        @foreach($rentabilidad_año_anterior as $index=>$historico)
+                        @php
+                          try{
+                            $dato_mes=$rentabilidad_año_actual[$index]['rentabilidad'];
+                          }
+                          catch(\Exception $e)
+                          {
+                              $dato_mes=0;
+                          }
+                        @endphp
                         <tr class="">
-                            <td class="py-2 px-5 border">Rentabilidad</td>
-                            <td class="py-2 px-3 border"><center>85%</td>
-                            <td class="py-2 px-3 border"><center>98%</td>
-                            <td class="py-2 px-3 border"><center>+15%</td>
+                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($historico['rentabilidad'],0)}}%</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}%</td>
+                            <td class="text-xs px-3 border"><center>{{($historico['rentabilidad']>0)?number_format(100*$dato_mes/($historico['rentabilidad'])-100,0):0}}%</td>
                         </tr>
+                        @endforeach
                     </table>
                 </div>
             </div>
@@ -158,7 +183,7 @@
                 <div class="w-full flex flex-col">
                     <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Ticket Promedio</span></div>
                     <div class="w-full">
-                    <canvas id="myChart8" width="200" height="300"></canvas>
+                    <canvas id="chartTicketPromedio" width="200" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -167,20 +192,43 @@
                     <table>
                         <tr class="bg-blue-700 text-white rounder-t-xl">
                             <td class="rounded-tl-xl"></td>
-                            <td class="py-2 rounded-tr-xl" colspan=3><center>YTD</td>                            
+                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                            <td class="py-2 px-3"><center>{{$año}}</td>
+                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
                         </tr>
-                        <tr class="bg-blue-700 text-white">
-                            <td class=""></td>
-                            <td class="py-2 px-3"><center>2020</td>
-                            <td class="py-2 px-3"><center>2021</td>
-                            <td class="py-2 px-3"><center>%var</td>
-                        </tr>
+                        @foreach($datos_año_anterior_array as $index=>$historico)
+                        @php
+                          try{
+                            $dato_mes=($datos_año_array[$index]['monto_act']+$datos_año_array[$index]['monto_aep']+$datos_año_array[$index]['monto_ren']+$datos_año_array[$index]['monto_rep'])/($datos_año_array[$index]['act']+$datos_año_array[$index]['aep']+$datos_año_array[$index]['ren']+$datos_año_array[$index]['rep']);
+                          }
+                          catch(\Exception $e)
+                          {
+                              $dato_mes=0;
+                           
+                          }
+                          try{
+                            $dato_historico=($historico['monto_act']+$historico['monto_aep']+$historico['monto_ren']+$historico['monto_rep'])/($historico['act']+$historico['aep']+$historico['ren']+$historico['rep']);
+                          }
+                          catch(\Exception $e)
+                          {
+                              $dato_historico=0;
+                          }
+                          try{
+                            $cambio_porc=($dato_mes/$dato_historico-1)*100;
+                          }
+                          catch(\Exception $e)
+                          {
+                              $cambio_porc=0;
+                          }
+                          
+                        @endphp
                         <tr class="">
-                            <td class="py-2 px-5 border">Ticket Promedio</td>
-                            <td class="py-2 px-3 border"><center>$344</td>
-                            <td class="py-2 px-3 border"><center>$345</td>
-                            <td class="py-2 px-3 border"><center>0%</td>
+                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($dato_historico,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($cambio_porc,0)}}%</td>
                         </tr>
+                        @endforeach
                     </table>
                 </div>
             </div>
@@ -189,7 +237,7 @@
                 <div class="w-full flex flex-col">
                     <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Flujo en sucursales</span></div>
                     <div class="w-full">
-                    <canvas id="myChart9" width="200" height="300"></canvas>
+                    <canvas id="chartFlujo" width="200" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -198,44 +246,75 @@
                     <table>
                         <tr class="bg-blue-700 text-white rounder-t-xl">
                             <td class="rounded-tl-xl"></td>
-                            <td class="py-2 rounded-tr-xl" colspan=3><center>YTD</td>                            
+                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                            <td class="py-2 px-3"><center>{{$año}}</td>
+                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
                         </tr>
-                        <tr class="bg-blue-700 text-white">
-                            <td class=""></td>
-                            <td class="py-2 px-3"><center>2020</td>
-                            <td class="py-2 px-3"><center>2021</td>
-                            <td class="py-2 px-3"><center>%var</td>
-                        </tr>
+                        @php
+                            $ytd_ant=0;
+                            $ytd_act=0;
+                        @endphp
+                        @foreach($flujo_año_anterior as $index=>$historico)
+                        @php
+                          try{
+                            $dato_mes=$flujo_año_actual[$index]['flujo'];
+                            $ytd_ant=$ytd_ant+$historico['flujo'];
+                            $ytd_act=$ytd_act+$dato_mes;
+                          }
+                          catch(\Exception $e)
+                          {
+                              $dato_mes=0;
+                          }
+                        @endphp
                         <tr class="">
-                            <td class="py-2 px-5 border">Trafico</td>
-                            <td class="py-2 px-3 border"><center>565,212</td>
-                            <td class="py-2 px-3 border"><center>558,654</td>
-                            <td class="py-2 px-3 border"><center>-2%</td>
+                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($historico['flujo'],0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{($historico['flujo']>0)?number_format(100*$dato_mes/($historico['flujo'])-100,0):0}}%</td>
+                        </tr>
+                        @endforeach
+                        <tr class="font-bold bg-gray-200">
+                            <td class="text-xs px-5 border">YTD</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
+                            <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
                         </tr>
                     </table>
                 </div>
             </div>
-        </div>  
+            @if($origen=="R" || $origen=="D")
+            <div class="w-full flex flex-col pb-4">
+                <div class="w-full p-4 bg-gray-200 text-gray-700 text-xl font-semibold border-b ">Detalles de : </div>
+                @foreach($lista_dd as $detalle)
+                <div class="w-full text-base font-semibold flex justify-center"><a href="/dashboard_comparativo/{{$periodo}}/{{($origen=="G"?'E':($origen=="R"?"G":"R"))}}/{{$detalle->llave}}/{{$detalle->value}}">{{$detalle->value}}</a></div>
+                @endforeach
+            </div>
+            @endif
+            </div>  
     </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.js"></script>   
 <script>
-var ctx = document.getElementById("myChart").getContext('2d');
-var ctx2 = document.getElementById("myChart2").getContext('2d');
-var ctx3 = document.getElementById("myChart3").getContext('2d');
-var ctx4 = document.getElementById("myChart4").getContext('2d');
-var ctx5 = document.getElementById("myChart5").getContext('2d');
-var ctx6 = document.getElementById("myChart6").getContext('2d');
-var ctx7 = document.getElementById("myChart7").getContext('2d');
-var ctx8 = document.getElementById("myChart8").getContext('2d');
-var ctx9 = document.getElementById("myChart9").getContext('2d');
+var activaciones = document.getElementById("chartActivaciones").getContext('2d');
+var activacionesCE = document.getElementById("chartActivacionesCE").getContext('2d');
+var activacionesSE = document.getElementById("chartActivacionesSE").getContext('2d');
+var renovaciones = document.getElementById("chartRenovaciones").getContext('2d');
+var renovacionesCE = document.getElementById("chartRenovacionesCE").getContext('2d');
+var renovacionesSE = document.getElementById("chartRenovacionesSE").getContext('2d');
+var rentabilidad = document.getElementById("chartRentabilidad").getContext('2d');
+var ticketPromedio = document.getElementById("chartTicketPromedio").getContext('2d');
+var flujo = document.getElementById("chartFlujo").getContext('2d');
 
-var myChart = new Chart(ctx, {
+new Chart(activaciones, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [3600,3800,3300,2400,2900,3400,3900,4000,3900,3800], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{$actual->act+$actual->aep}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -243,8 +322,12 @@ var myChart = new Chart(ctx, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [3400,3200,3100,2800,3000,3900,3900,3500,3200,3300,3950,4000], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+                {{$anterior->act+$anterior->aep}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#ccf5ff', // Add custom color border (Line)
             backgroundColor: '#ccf5ff', // Add custom color background (Points and Fill)
@@ -262,13 +345,17 @@ var myChart = new Chart(ctx, {
         }
     }
 });
-var myChart2 = new Chart(ctx2, {
+new Chart(activacionesCE, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [1620,1710,1485,1080,1305,1530,1755,1800,1755,1710], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{$actual->act}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -276,8 +363,12 @@ var myChart2 = new Chart(ctx2, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [1530,1440,1395,1260,1350,1755,1755,1575,1440,1485,1778,1800], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+                {{$anterior->act}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#ccf5ff', // Add custom color border (Line)
             backgroundColor: '#ccf5ff', // Add custom color background (Points and Fill)
@@ -295,13 +386,17 @@ var myChart2 = new Chart(ctx2, {
         }
     }
 });
-var myChart3 = new Chart(ctx3, {
+new Chart(activacionesSE, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [1870,1760,1705,1540,1650,2145,2145,1925,1760,1815], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{$actual->aep}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -309,8 +404,12 @@ var myChart3 = new Chart(ctx3, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [1870,1760,1705,1540,1650,2145,2145,1925,1760,1815,2174,2200], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+                {{$anterior->aep}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#ccf5ff', // Add custom color border (Line)
             backgroundColor: '#ccf5ff', // Add custom color background (Points and Fill)
@@ -328,13 +427,17 @@ var myChart3 = new Chart(ctx3, {
         }
     }
 });
-var myChart4 = new Chart(ctx4, {
+new Chart(renovaciones, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [2520,2660,2310,1680,2030,2380,2730,2800,2730,2660], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{$actual->ren+$actual->rep}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -342,8 +445,12 @@ var myChart4 = new Chart(ctx4, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [2380,2240,2170,1960,2100,2730,2730,2450,2240,2310,2765,2800], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+                {{$anterior->ren+$anterior->rep}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#b3ffe0', // Add custom color border (Line)
             backgroundColor: '#b3ffe0', // Add custom color background (Points and Fill)
@@ -361,13 +468,17 @@ var myChart4 = new Chart(ctx4, {
         }
     }
 });
-var myChart5 = new Chart(ctx5, {
+new Chart(renovacionesCE, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [1134,1197,1039,756,913,1071,1228,1260,1228,1197], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{$actual->ren}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -375,41 +486,12 @@ var myChart5 = new Chart(ctx5, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [1071,1008,976,882,945,1228,1228,1102,1008,1039,1244,1260], // Specify the data values array
-            fill: true,
-            borderColor: '#b3ffe0', // Add custom color border (Line)
-            backgroundColor: '#b3ffe0', // Add custom color background (Points and Fill)
-            borderWidth: 1, // Specify bar border width
-            tension_:0.1
-        }]
-    },
-    options: {
-      responsive: true, // Instruct chart js to respond nicely.
-      maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height
-      scales: {
-        y: {
-            min: 0,
-        }
-        } 
-    }
-});
-var myChart6 = new Chart(ctx6, {
-    type: 'line',
-    data: {
-        labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
-        datasets: [{
-            label: '2021', // Name the series
-            data: [1309,1232,1193,1078,1155,1501,1501,1347,1232,1270], // Specify the data values array
-            fill: false,
-            borderColor: '#FF0000', // Add custom color border (Line)
-            backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
-            borderWidth: 1, // Specify bar border width
-            tension:0.1
-        },
-                  {
-            label: '2020', // Name the series
-            data: [1309,1232,1193,1078,1155,1501,1501,1347,1232,1270,1520,1540], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+                {{$anterior->ren}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#b3ffe0', // Add custom color border (Line)
             backgroundColor: '#b3ffe0', // Add custom color background (Points and Fill)
@@ -427,13 +509,17 @@ var myChart6 = new Chart(ctx6, {
         }
     }
 });
-var myChart7 = new Chart(ctx7, {
+new Chart(renovacionesSE, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [0.92,0.93,0.92,0.95,0.96,0.94,0.96,0.97,1.01,1.04], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{$actual->rep}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -441,8 +527,54 @@ var myChart7 = new Chart(ctx7, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [0.8,0.81,0.8,0.82,0.82,0.83,0.82,0.85,0.86,0.87,0.92,0.98], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+                {{$anterior->rep}},
+            @endforeach
+                  ],
+            fill: true,
+            borderColor: '#b3ffe0', // Add custom color border (Line)
+            backgroundColor: '#b3ffe0', // Add custom color background (Points and Fill)
+            borderWidth: 1, // Specify bar border width
+            tension_:0.1
+        }]
+    },
+    options: {
+      responsive: true, // Instruct chart js to respond nicely.
+      maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height 
+      scales: {
+        y: {
+            min: 0,
+        }
+        }
+    }
+});
+
+new Chart(rentabilidad, {
+    type: 'line',
+    data: {
+        labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+        datasets: [{
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($rentabilidad_año_actual as $actual)
+                {{$actual['rentabilidad']}},
+            @endforeach
+                  ],
+            fill: false,
+            borderColor: '#FF0000', // Add custom color border (Line)
+            backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
+            borderWidth: 1, // Specify bar border width
+            tension:0.1
+        },
+            {
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($rentabilidad_año_anterior as $anterior)
+                {{$anterior['rentabilidad']}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#ffff66', // Add custom color border (Line)
             backgroundColor: '#ffff66', // Add custom color background (Points and Fill)
@@ -460,13 +592,17 @@ var myChart7 = new Chart(ctx7, {
         }
     }
 });
-var myChart8 = new Chart(ctx8, {
+new Chart(ticketPromedio, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [350,351,342,343,344,344,342,343,342,344], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año as $actual)
+                {{($actual->monto_act+$actual->monto_aep+$actual->monto_ren+$actual->monto_rep)/($actual->act+$actual->aep+$actual->ren+$actual->rep)}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -474,8 +610,12 @@ var myChart8 = new Chart(ctx8, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [344,342,345,360,322,344,346,324,351,340,320,340], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($datos_año_anterior as $anterior)
+            {{($anterior->monto_act+$anterior->monto_aep+$anterior->monto_ren+$anterior->monto_rep)/($anterior->act+$anterior->aep+$anterior->ren+$anterior->rep)}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#ffad99', // Add custom color border (Line)
             backgroundColor: '#ffad99', // Add custom color background (Points and Fill)
@@ -493,13 +633,17 @@ var myChart8 = new Chart(ctx8, {
         }
     }
 });
-var myChart9 = new Chart(ctx9, {
+new Chart(flujo, {
     type: 'line',
     data: {
         labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
         datasets: [{
-            label: '2021', // Name the series
-            data: [54000,54000,51000,53000,54000,56000,58000,59000,58000,59000], // Specify the data values array
+            label: {{$año}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($flujo_año_actual as $actual)
+                {{$actual['flujo']}},
+            @endforeach
+                  ],
             fill: false,
             borderColor: '#FF0000', // Add custom color border (Line)
             backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
@@ -507,8 +651,12 @@ var myChart9 = new Chart(ctx9, {
             tension:0.1
         },
                   {
-            label: '2020', // Name the series
-            data: [52000,53000,54000,55000,56000,57000,58000,59000,60000,61000,62000,63000], // Specify the data values array
+            label: {{$año_anterior}}, // Name the series
+            data: [ // Specify the data values array
+            @foreach($flujo_año_anterior as $anterior)
+                {{$anterior['flujo']}},
+            @endforeach
+                  ],
             fill: true,
             borderColor: '#ccf5ff', // Add custom color border (Line)
             backgroundColor: '#ccf5ff', // Add custom color background (Points and Fill)
@@ -524,72 +672,6 @@ var myChart9 = new Chart(ctx9, {
             min: 0,
         }
         }
-    }
-});
-var myChart8 = new Chart(ctx8, {
-    type: 'line',
-    data: {
-        labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
-        datasets: [{
-            label: '2021', // Name the series
-            data: [500,	50,	2424,	14040,	14141,	4111,	4544,	47,	5555, 6811], // Specify the data values array
-            fill: false,
-            borderColor: '#FF0000', // Add custom color border (Line)
-            backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
-            borderWidth: 1, // Specify bar border width
-            tension:0.1
-        },
-                  {
-            label: '2020', // Name the series
-            data: [1288,	88942,	44545,	7588,	99,	242,	1417,	5504,	75, 457], // Specify the data values array
-            fill: true,
-            borderColor: '#ccf5ff', // Add custom color border (Line)
-            backgroundColor: '#ccf5ff', // Add custom color background (Points and Fill)
-            borderWidth: 1, // Specify bar border width
-            tension_:0.1
-        }]
-    },
-    options: {
-      responsive: true, // Instruct chart js to respond nicely.
-      maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height 
-      scales: {
-        y: {
-            min: 0,
-        }
-        }
-    }
-});
-var myChart9 = new Chart(ctx9, {
-    type: 'line',
-    data: {
-        labels: ["Ene",	"Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
-        datasets: [{
-            label: '2021', // Name the series
-            data: [500,	50,	2424,	14040,	14141,	4111,	4544,	47,	5555, 6811], // Specify the data values array
-            fill: false,
-            borderColor: '#FF0000', // Add custom color border (Line)
-            backgroundColor: '#FF0000', // Add custom color background (Points and Fill)
-            borderWidth: 1, // Specify bar border width
-            tension:0.1
-        },
-                  {
-            label: '2020', // Name the series
-            data: [1288,	88942,	44545,	7588,	99,	242,	1417,	5504,	75, 457], // Specify the data values array
-            fill: true,
-            borderColor: '#ccf5ff', // Add custom color border (Line)
-            backgroundColor: '#ccf5ff', // Add custom color background (Points and Fill)
-            borderWidth: 1, // Specify bar border width
-            tension_:0.1
-        }]
-    },
-    options: {
-      responsive: true, // Instruct chart js to respond nicely.
-      maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height
-      scales: {
-        y: {
-            min: 0,
-        }
-        } 
     }
 });
 </script>  

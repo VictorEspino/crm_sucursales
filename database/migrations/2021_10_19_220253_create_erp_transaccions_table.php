@@ -34,6 +34,7 @@ class CreateErpTransaccionsTable extends Migration
             $table->string('producto')->nullable();
             $table->string('carga_id',10);
             $table->integer('empleado_carga');
+            $table->string('direccion')->default('SUCURSALES');
             $table->timestamps();
         });
     }
