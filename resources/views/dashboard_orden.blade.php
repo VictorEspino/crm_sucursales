@@ -185,56 +185,85 @@
                                 }
                             }
                             try{
+                                if(($ac_f+$ac_p)>0)
                                 $ac_f_p=100*$ac_f/($ac_f+$ac_p);
+                                else
+                                $ac_f_p=0;
                             }
                             catch(Exception $e)
                             {
                                 $ac_f_p=0;
                             }
                             try{
+                                if(($ac_f+$ac_p)>0)
                                 $ac_p_p=100*$ac_p/($ac_f+$ac_p);
+                                else
+                                $ac_p_p=0;
+
                             }
                             catch(Exception $e)
                             {
                                 $ac_p_p=0;
                             }
                             try{
+                                if(($as_f+$as_p)>0)
                                 $as_f_p=100*$as_f/($as_f+$as_p);
+                                else
+                                $as_f_p=0;
                             }
                             catch(Exception $e)
                             {
                                 $as_f_p=0;
                             }
                             try{
+                                if(($as_f+$as_p)>0)
                                 $as_p_p=100*$as_p/($as_f+$as_p);
+                                else
+                                $as_p_p=0;
+
                             }
                             catch(Exception $e)
                             {
                                 $as_p_p=0;
                             }
                             try{
+                                if(($rc_f+$rc_p)>0)
                                 $rc_f_p=100*$rc_f/($rc_f+$rc_p);
+                                else
+                                $rc_f_p=0;
+
                             }
                             catch(Exception $e)
                             {
                                 $rc_f_p=0;
                             }
                             try{
+                                if(($rc_f+$rc_p)>0)
                                 $rc_p_p=100*$rc_p/($rc_f+$rc_p);
+                                else
+                                $rc_p_p=0;
                             }
                             catch(Exception $e)
                             {
                                 $rc_p_p=0;
                             }
                             try{
+                                if(($rs_f+$rs_p)>0)
                                 $rs_f_p=100*$rs_f/($rs_f+$rs_p);
+                                else
+                                $rs_f_p=0;
+
                             }
                             catch(Exception $e)
                             {
                                 $rs_f_p=0;
                             }
                             try{
+                                if(($rs_f+$rs_p)>0)
                                 $rs_p_p=100*$rs_p/($rs_f+$rs_p);
+                                else
+                                $rs_p_p=0;
+
                             }
                             catch(Exception $e)
                             {

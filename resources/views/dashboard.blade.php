@@ -3,7 +3,7 @@
             {{ __('Dashboard') }}
     </x-slot>
 
-    <div class="flex flex-col w-full bg-white text-gray-700 shadow-lg rounded-lg">
+    <div class="flex flex-col w-full text-gray-700 shadow-lg rounded-lg px-3 md:px-0">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
             <div class="w-full text-lg font-semibold">Acceso a Indicadores</div>
             <div class="w-full text-sm">({{Auth::user()->udn}}) - {{Auth::user()->pdv}}</div>
@@ -11,16 +11,52 @@
         </div> <!--FIN ENCABEZADO-->
         <div class="w-full bg-white p-3 flex flex-col text-sm">
             Periodo&nbsp;&nbsp;
-            <select class="w-1/6 rounded p-1 border border-gray-300" type="text" id="periodo">
+            <select class="w-1/2 md:w-1/6 rounded p-1 border border-gray-300" type="text" id="periodo">
                 @foreach($periodos as $periodo)
                 <option value="{{$periodo->periodo}}" {{session('periodo')==$periodo->periodo?'selected':''}}>{{$periodo->periodo}}</option>
                 @endforeach
             </select>
 
         </div>
-        <div class="w-full rounded-b-lg bg-white p-3 flex flex-col"> <!--CONTENIDO-->
+        @if(Auth::user()->puesto=='Director')
+        <div class="py-3 w-full bg-gray-200 text-base px-3">
+            Vista Direccion General
+        </div>
+        <div class="w-full bg-white pb-5">
             <div class="w-full flex flex-row">
+                <div class="w-1/3 flex flex-col justify-center">
+                    <div class="w-full pt-5 flex justify-center text-5xl font-semibold text-red-400">                        
+                        <a href="javascript:general()"><i class="fas fa-building"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        General
+                    </div>
+                </div>
+                <div class="w-1/3 flex flex-col justify-center">
+                    <div class="w-full pt-5 flex justify-center text-5xl font-semibold text-blue-400">                        
+                        <a href="javascript:comparativo()"><i class="fas fa-store"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Sucursales
+                    </div>
+                </div>
                 <div class="w-1/3 flex flex-col">
+                    <div class="w-full pt-5 flex justify-center text-5xl font-semibold text-yellow-500">
+                        <a href="javascript:socios_comparativo()"><i class="far fa-handshake"></i></a>
+                    </div>
+                    <div class="w-full flex justify-center">
+                        Socios
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        <div class="py-3 w-full bg-gray-200 text-base px-3">
+            Sucursales
+        </div>
+        <div class="w-full rounded-b-lg bg-white p-3 flex flex-col"> <!--CONTENIDO-->
+            <div class="w-full flex flex-row  justify-center text-center">
+                <div class="w-1/3 flex flex-col justify-center text-center">
                     <div class="w-full pt-3 flex justify-center text-5xl font-semibold text-green-700">                        
                         <a href="javascript:efectividad()"><i class="fas fa-funnel-dollar"></i></a>
                     </div>
@@ -86,10 +122,10 @@
         </div>
         @if(Auth::user()->puesto=='Director')
         <div class="py-3 w-full bg-gray-200 text-base px-3">
-            Socios Comerciales/Empresarial
+            Socios Comerciales/Empresarial 
         </div>
-        <div class="w-full bg-white pb-10">
-            <div class="w-full flex flex-row">
+        <div class="w-full bg-white pb-5 ">
+            <div class="w-full flex flex-row  justify-center text-center">
                 <div class="w-1/3 flex flex-col">
                     <div class="w-full pt-5 flex justify-center text-5xl font-semibold text-red-400">                        
                         <a href="javascript:socios_comparativo()"><i class="fas fa-atlas"></i></a>
@@ -165,6 +201,11 @@
         {
             periodo=document.getElementById("periodo").value;
             document.location.href="/socios_diario/"+periodo;
+        }
+        function general()
+        {
+            periodo=document.getElementById("periodo").value;
+            document.location.href="/dashboard_dg/"+periodo;
         }
     </script>
 </x-app-layout>

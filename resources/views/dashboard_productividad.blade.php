@@ -107,6 +107,8 @@
                     <td class="{{$color?'bg-gray-200':''}} border border-gray-400 text-gray-700 font-light px-3"><center>
                     @php
                         try{
+                            $cumplimiento=0;
+                            if($minutos_objetivo_det>0)
                             $cumplimiento=100*($detalle->interaccion+$detalle->funnel+$detalle->ordenes+$detalle->demanda+$detalle->otras)/($minutos_objetivo_det);
                         }
                         catch(\Exception $e)

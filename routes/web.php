@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProcesaFormasController;
 use App\Http\Controllers\ProcesaSeguimientoController;
 use App\Http\Controllers\DashboardsController;
+use App\Http\Controllers\DashboardGeneral;
 use App\Http\Controllers\DashboardEjecutivoController;
 use App\Http\Controllers\DashboardComparativoController;
 use App\Http\Controllers\ExportController;
@@ -128,3 +129,7 @@ Route::get('/socios_diario/{periodo}', [DashboardSocios::class,'diario'])->middl
 Route::get('/socios_comparativo/{periodo}', [DashboardSocios::class,'comparativo'])->middleware('auth')->name('socios_comparativo');
 
 Route::get('/export_rentabilidad/{periodo}', [DashboardsController::class,'export_rentabilidad'])->middleware('auth')->name('export_rentabilidad');
+
+//DG
+
+Route::get('/dashboard_dg/{periodo}', [DashboardGeneral::class,'general'])->middleware('auth')->name('dashboard_dg');

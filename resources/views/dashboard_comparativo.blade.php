@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-            {{ __('Dashboard Ejecutivo') }}
+            {{ __('Dashboard Ejecutivo Sucursales') }}
     </x-slot>
-    <div class="flex flex-col w-full  bg-white text-gray-700 shadow-lg rounded-lg">
+    <div class="flex flex-col w-full text-gray-700 shadow-lg rounded-lg px-3">
         <div class="w-full rounded-t-lg bg-gray-200 p-3 flex flex-col border-b border-gray-800"> <!--ENCABEZADO-->
             <div class="w-full text-lg font-semibold">Medicion ejecutiva - {{$periodo}}</div>
             <div class="w-full text-lg font-semibold">{{$titulo}}</div>
@@ -13,274 +13,288 @@
             <div class="w-full text-sm font-semibold text-red-400">Ultimo dia de información : {{$ultimo_dia}}</div>
         </div> <!--FIN ENCABEZADO-->
         <div class="w-full  bg-white rounded-b-lg flex flex-wrap space-y-10">
-            <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Activaciones</div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex flex-col">
-                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones</span></div>
-                    <div class="w-full">
-                    <canvas id="chartActivaciones" width="200" height="300"></canvas>
+            <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700 flex">Activaciones</div>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex flex-col">
+                        <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones</span></div>
+                        <div class="w-full">
+                        <canvas id="chartActivaciones" width="200" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center">
+                        <table>
+                            <tr class="bg-blue-700 text-white rounder-t-xl">
+                                <td class="rounded-tl-xl"></td>
+                                <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                                <td class="py-2 px-3"><center>{{$año}}</td>
+                                <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
+                            </tr>
+                            @php
+                                $ytd_ant=0;
+                                $ytd_act=0;
+                            @endphp
+                            @foreach($datos_año_anterior_array as $index=>$historico)
+                            @php
+                            try{
+                                $dato_mes=$datos_año_array[$index]['act']+$datos_año_array[$index]['aep'];
+                                $ytd_ant=$ytd_ant+$historico['act']+$historico['aep'];
+                                $ytd_act=$ytd_act+$dato_mes;
+                            }
+                            catch(\Exception $e)
+                            {
+                                $dato_mes=0;
+                            }
+                            @endphp
+                            <tr class="">
+                                <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($historico['act']+$historico['aep'],0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{($historico['act']+$historico['aep']>0)?number_format(100*$dato_mes/($historico['act']+$historico['aep'])-100,0):0}}%</td>
+                            </tr>
+                            @endforeach
+                            <tr class="font-bold bg-gray-200">
+                                <td class="text-xs px-5 border">YTD</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center">
-                    <table>
-                        <tr class="bg-blue-700 text-white rounder-t-xl">
-                            <td class="rounded-tl-xl"></td>
-                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
-                            <td class="py-2 px-3"><center>{{$año}}</td>
-                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
-                        </tr>
-                        @php
-                            $ytd_ant=0;
-                            $ytd_act=0;
-                        @endphp
-                        @foreach($datos_año_anterior_array as $index=>$historico)
-                        @php
-                          try{
-                            $dato_mes=$datos_año_array[$index]['act']+$datos_año_array[$index]['aep'];
-                            $ytd_ant=$ytd_ant+$historico['act']+$historico['aep'];
-                            $ytd_act=$ytd_act+$dato_mes;
-                          }
-                          catch(\Exception $e)
-                          {
-                              $dato_mes=0;
-                          }
-                        @endphp
-                        <tr class="">
-                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($historico['act']+$historico['aep'],0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{($historico['act']+$historico['aep']>0)?number_format(100*$dato_mes/($historico['act']+$historico['aep'])-100,0):0}}%</td>
-                        </tr>
-                        @endforeach
-                        <tr class="font-bold bg-gray-200">
-                            <td class="text-xs px-5 border">YTD</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
-                        </tr>
-                    </table>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4 flex flex-col">
+                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones CON equipo</span></div>
+                        <div class="w-full">
+                        <canvas id="chartActivacionesCE" width="200" height="300"></canvas>
+                        </div>
                 </div>
-            </div>
-            <div class="w-1/2 p-4 flex flex-col">
-                <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones CON equipo</span></div>
-                    <div class="w-full">
-                    <canvas id="chartActivacionesCE" width="200" height="300"></canvas>
-                    </div>
-            </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones SIN equipo</span></div>
-                    <div class="w-full">
-                    <canvas id="chartActivacionesSE" width="200" height="300"></canvas>
-                    </div>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Activaciones SIN equipo</span></div>
+                        <div class="w-full">
+                        <canvas id="chartActivacionesSE" width="200" height="300"></canvas>
+                        </div>
+                </div>
             </div>
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Renovaciones</div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex flex-col">
-                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones</span></div>
-                    <div class="w-full">
-                    <canvas id="chartRenovaciones" width="200" height="300"></canvas>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex flex-col">
+                        <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones</span></div>
+                        <div class="w-full">
+                        <canvas id="chartRenovaciones" width="200" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center">
+                        <table>
+                            <tr class="bg-blue-700 text-white rounder-t-xl">
+                                <td class="rounded-tl-xl"></td>
+                                <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                                <td class="py-2 px-3"><center>{{$año}}</td>
+                                <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
+                            </tr>
+                            @php
+                                $ytd_ant=0;
+                                $ytd_act=0;
+                            @endphp
+                            @foreach($datos_año_anterior_array as $index=>$historico)
+                            @php
+                            try{
+                                $dato_mes=$datos_año_array[$index]['ren']+$datos_año_array[$index]['rep'];
+                                $ytd_ant=$ytd_ant+$historico['ren']+$historico['rep'];
+                                $ytd_act=$ytd_act+$dato_mes;
+                            }
+                            catch(\Exception $e)
+                            {
+                                $dato_mes=0;
+                            }
+                            @endphp
+                            <tr class="">
+                                <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($historico['ren']+$historico['rep'],0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{($historico['ren']+$historico['rep']>0)?number_format(100*$dato_mes/($historico['ren']+$historico['rep'])-100,0):0}}%</td>
+                            </tr>
+                            @endforeach
+                            <tr class="font-bold bg-gray-200">
+                                <td class="text-xs px-5 border">YTD</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center">
-                    <table>
-                        <tr class="bg-blue-700 text-white rounder-t-xl">
-                            <td class="rounded-tl-xl"></td>
-                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
-                            <td class="py-2 px-3"><center>{{$año}}</td>
-                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
-                        </tr>
-                        @php
-                            $ytd_ant=0;
-                            $ytd_act=0;
-                        @endphp
-                        @foreach($datos_año_anterior_array as $index=>$historico)
-                        @php
-                          try{
-                            $dato_mes=$datos_año_array[$index]['ren']+$datos_año_array[$index]['rep'];
-                            $ytd_ant=$ytd_ant+$historico['ren']+$historico['rep'];
-                            $ytd_act=$ytd_act+$dato_mes;
-                          }
-                          catch(\Exception $e)
-                          {
-                              $dato_mes=0;
-                          }
-                        @endphp
-                        <tr class="">
-                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($historico['ren']+$historico['rep'],0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{($historico['ren']+$historico['rep']>0)?number_format(100*$dato_mes/($historico['ren']+$historico['rep'])-100,0):0}}%</td>
-                        </tr>
-                        @endforeach
-                        <tr class="font-bold bg-gray-200">
-                            <td class="text-xs px-5 border">YTD</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
-                        </tr>
-                    </table>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4 flex flex-col">
+                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones CON equipo</span></div>
+                        <div class="w-full">
+                        <canvas id="chartRenovacionesCE" width="200" height="300"></canvas>
+                        </div>
                 </div>
-            </div>
-            <div class="w-1/2 p-4 flex flex-col">
-                <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones CON equipo</span></div>
-                    <div class="w-full">
-                    <canvas id="chartRenovacionesCE" width="200" height="300"></canvas>
-                    </div>
-            </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones SIN equipo</span></div>
-                    <div class="w-full">
-                    <canvas id="chartRenovacionesSE" width="200" height="300"></canvas>
-                    </div>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Renovaciones SIN equipo</span></div>
+                        <div class="w-full">
+                        <canvas id="chartRenovacionesSE" width="200" height="300"></canvas>
+                        </div>
+                </div>
             </div>
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Rentabilidad</div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex flex-col">
-                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Rentabilidad</span></div>
-                    <div class="w-full">
-                    <canvas id="chartRentabilidad" width="200" height="300"></canvas>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex flex-col">
+                        <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Rentabilidad</span></div>
+                        <div class="w-full">
+                        <canvas id="chartRentabilidad" width="200" height="300"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center">
-                    <table>
-                        <tr class="bg-blue-700 text-white rounder-t-xl">
-                            <td class="rounded-tl-xl"></td>
-                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
-                            <td class="py-2 px-3"><center>{{$año}}</td>
-                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
-                        </tr>
-                        @php
-                            $ytd_ant=0;
-                            $ytd_act=0;
-                        @endphp
-                        @foreach($rentabilidad_año_anterior as $index=>$historico)
-                        @php
-                          try{
-                            $dato_mes=$rentabilidad_año_actual[$index]['rentabilidad'];
-                          }
-                          catch(\Exception $e)
-                          {
-                              $dato_mes=0;
-                          }
-                        @endphp
-                        <tr class="">
-                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($historico['rentabilidad'],0)}}%</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}%</td>
-                            <td class="text-xs px-3 border"><center>{{($historico['rentabilidad']>0)?number_format(100*$dato_mes/($historico['rentabilidad'])-100,0):0}}%</td>
-                        </tr>
-                        @endforeach
-                    </table>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center">
+                        <table>
+                            <tr class="bg-blue-700 text-white rounder-t-xl">
+                                <td class="rounded-tl-xl"></td>
+                                <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                                <td class="py-2 px-3"><center>{{$año}}</td>
+                                <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
+                            </tr>
+                            @php
+                                $ytd_ant=0;
+                                $ytd_act=0;
+                            @endphp
+                            @foreach($rentabilidad_año_anterior as $index=>$historico)
+                            @php
+                            try{
+                                $dato_mes=$rentabilidad_año_actual[$index]['rentabilidad'];
+                            }
+                            catch(\Exception $e)
+                            {
+                                $dato_mes=0;
+                            }
+                            @endphp
+                            <tr class="">
+                                <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($historico['rentabilidad'],0)}}%</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}%</td>
+                                <td class="text-xs px-3 border"><center>{{($historico['rentabilidad']>0)?number_format(100*$dato_mes/($historico['rentabilidad'])-100,0):0}}%</td>
+                            </tr>
+                            @endforeach
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Ticket Promedio</div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex flex-col">
-                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Ticket Promedio</span></div>
-                    <div class="w-full">
-                    <canvas id="chartTicketPromedio" width="200" height="300"></canvas>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex flex-col">
+                        <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Ticket Promedio</span></div>
+                        <div class="w-full">
+                        <canvas id="chartTicketPromedio" width="200" height="300"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center">
-                    <table>
-                        <tr class="bg-blue-700 text-white rounder-t-xl">
-                            <td class="rounded-tl-xl"></td>
-                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
-                            <td class="py-2 px-3"><center>{{$año}}</td>
-                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
-                        </tr>
-                        @foreach($datos_año_anterior_array as $index=>$historico)
-                        @php
-                          try{
-                            $dato_mes=($datos_año_array[$index]['monto_act']+$datos_año_array[$index]['monto_aep']+$datos_año_array[$index]['monto_ren']+$datos_año_array[$index]['monto_rep'])/($datos_año_array[$index]['act']+$datos_año_array[$index]['aep']+$datos_año_array[$index]['ren']+$datos_año_array[$index]['rep']);
-                          }
-                          catch(\Exception $e)
-                          {
-                              $dato_mes=0;
-                           
-                          }
-                          try{
-                            $dato_historico=($historico['monto_act']+$historico['monto_aep']+$historico['monto_ren']+$historico['monto_rep'])/($historico['act']+$historico['aep']+$historico['ren']+$historico['rep']);
-                          }
-                          catch(\Exception $e)
-                          {
-                              $dato_historico=0;
-                          }
-                          try{
-                            $cambio_porc=($dato_mes/$dato_historico-1)*100;
-                          }
-                          catch(\Exception $e)
-                          {
-                              $cambio_porc=0;
-                          }
-                          
-                        @endphp
-                        <tr class="">
-                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($dato_historico,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($cambio_porc,0)}}%</td>
-                        </tr>
-                        @endforeach
-                    </table>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center">
+                        <table>
+                            <tr class="bg-blue-700 text-white rounder-t-xl">
+                                <td class="rounded-tl-xl"></td>
+                                <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                                <td class="py-2 px-3"><center>{{$año}}</td>
+                                <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
+                            </tr>
+                            @foreach($datos_año_anterior_array as $index=>$historico)
+                            @php
+                            try{
+                                $dato_mes=($datos_año_array[$index]['monto_act']+$datos_año_array[$index]['monto_aep']+$datos_año_array[$index]['monto_ren']+$datos_año_array[$index]['monto_rep'])/($datos_año_array[$index]['act']+$datos_año_array[$index]['aep']+$datos_año_array[$index]['ren']+$datos_año_array[$index]['rep']);
+                            }
+                            catch(\Exception $e)
+                            {
+                                $dato_mes=0;
+                            
+                            }
+                            try{
+                                $dato_historico=($historico['monto_act']+$historico['monto_aep']+$historico['monto_ren']+$historico['monto_rep'])/($historico['act']+$historico['aep']+$historico['ren']+$historico['rep']);
+                            }
+                            catch(\Exception $e)
+                            {
+                                $dato_historico=0;
+                            }
+                            try{
+                                $cambio_porc=($dato_mes/$dato_historico-1)*100;
+                            }
+                            catch(\Exception $e)
+                            {
+                                $cambio_porc=0;
+                            }
+                            
+                            @endphp
+                            <tr class="">
+                                <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($dato_historico,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($cambio_porc,0)}}%</td>
+                            </tr>
+                            @endforeach
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="w-full p-3 text-base font-semibold bg-gray-200 text-gray-700">Trafico</div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex flex-col">
-                    <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Flujo en sucursales</span></div>
-                    <div class="w-full">
-                    <canvas id="chartFlujo" width="200" height="300"></canvas>
+            <div class="w-full flex flex-col md:flex-row">
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex flex-col">
+                        <div class="w-full flex justify-center"><span class="text-base font-semibold text-gray-700">Flujo en sucursales</span></div>
+                        <div class="w-full">
+                        <canvas id="chartFlujo" width="200" height="300"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="w-1/2 p-4">
-                <div class="w-full flex justify-center">
-                    <table>
-                        <tr class="bg-blue-700 text-white rounder-t-xl">
-                            <td class="rounded-tl-xl"></td>
-                            <td class="py-2 px-3"><center>{{$año_anterior}}</td>
-                            <td class="py-2 px-3"><center>{{$año}}</td>
-                            <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
-                        </tr>
-                        @php
-                            $ytd_ant=0;
-                            $ytd_act=0;
-                        @endphp
-                        @foreach($flujo_año_anterior as $index=>$historico)
-                        @php
-                          try{
-                            $dato_mes=$flujo_año_actual[$index]['flujo'];
-                            $ytd_ant=$ytd_ant+$historico['flujo'];
-                            $ytd_act=$ytd_act+$dato_mes;
-                          }
-                          catch(\Exception $e)
-                          {
-                              $dato_mes=0;
-                          }
-                        @endphp
-                        <tr class="">
-                            <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($historico['flujo'],0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{($historico['flujo']>0)?number_format(100*$dato_mes/($historico['flujo'])-100,0):0}}%</td>
-                        </tr>
-                        @endforeach
-                        <tr class="font-bold bg-gray-200">
-                            <td class="text-xs px-5 border">YTD</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
-                            <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
-                        </tr>
-                    </table>
+                <div class="w-full md:w-1/2 p-4">
+                    <div class="w-full flex justify-center">
+                        <table>
+                            <tr class="bg-blue-700 text-white rounder-t-xl">
+                                <td class="rounded-tl-xl"></td>
+                                <td class="py-2 px-3"><center>{{$año_anterior}}</td>
+                                <td class="py-2 px-3"><center>{{$año}}</td>
+                                <td class="py-2 px-3 rounded-tr-xl"><center>%var</td>
+                            </tr>
+                            @php
+                                $ytd_ant=0;
+                                $ytd_act=0;
+                            @endphp
+                            @foreach($flujo_año_anterior as $index=>$historico)
+                            @php
+                            try{
+                                $dato_mes=$flujo_año_actual[$index]['flujo'];
+                                $ytd_ant=$ytd_ant+$historico['flujo'];
+                                $ytd_act=$ytd_act+$dato_mes;
+                            }
+                            catch(\Exception $e)
+                            {
+                                $dato_mes=0;
+                            }
+                            @endphp
+                            <tr class="">
+                                <td class="text-xs px-5 border">{{$meses[substr($historico['periodo'],5,2)]}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($historico['flujo'],0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($dato_mes,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{($historico['flujo']>0)?number_format(100*$dato_mes/($historico['flujo'])-100,0):0}}%</td>
+                            </tr>
+                            @endforeach
+                            <tr class="font-bold bg-gray-200">
+                                <td class="text-xs px-5 border">YTD</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($ytd_ant,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{number_format($ytd_act,0)}}</td>
+                                <td class="text-xs px-3 border"><center>{{($ytd_ant>0)?number_format(100*$ytd_act/($ytd_ant)-100,0):0}}%</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
             @if($origen=="R" || $origen=="D")

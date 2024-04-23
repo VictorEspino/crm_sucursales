@@ -351,10 +351,10 @@ class DashboardsController extends Controller
             $c_rs=$c_rs/$ejecutivos;
         }
         try{
-            $a_ac=100*$ac/$c_ac;
-            $a_as=100*$as/$c_as;
-            $a_rc=100*$rc/$c_rc;
-            $a_rs=100*$rs/$c_rs;
+            $a_ac=$c_ac!=0?100*$ac/$c_ac:0;
+            $a_as=$c_as!=0?100*$as/$c_as:0;
+            $a_rc=$c_rc!=0?100*$rc/$c_rc:0;
+            $a_rs=$c_rs!=0?100*$rs/$c_rs:0;
         }
         catch(\Exception $e)
         {

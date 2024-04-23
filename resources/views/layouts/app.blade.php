@@ -18,7 +18,7 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
         <!-- Styles -->
-        <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+        <link rel="stylesheet" href="{{ mix('css/app.css') }}?v={rand(1,30000)}">
 
         @livewireStyles
 
@@ -27,7 +27,7 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
 
 <!-- PARA EL DASHBOARD -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
+    <!--<link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">-->
 
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -137,7 +137,7 @@ $alert_objetivos=App\Http\Controllers\DashboardsController::alert_objetivos();
 
                 bg-side-nav w-1/2 md:w-1/6 lg:w-1/6 border-r border-side-nav hidden md:block lg:block
                 -->
-                <div id="sidebar" class="bg-gray-300 text-gray-700 h-screen flex w-52 flex-shrink-0 border-r border-side-nav md:block lg:block">
+                <div id="sidebar" class="hidden md:block bg-gray-300 text-gray-700 h-screen flex w-52 flex-shrink-0 border-r border-side-nav md:block lg:block">
                     
                     <div>
                         <ul class="list-reset flex flex-col">

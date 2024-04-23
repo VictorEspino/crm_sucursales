@@ -19,15 +19,15 @@
                     </x-jet-nav-link>
                 </div>
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col hidden md:block">
                 <div class="text-xs font-semibold text-gray-200 pt-1">Facturadas vs Visitas (%)</div>
                 <div id="chart_div" class="flex justify-center"></div>
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col hidden md:block">
                 <div class="text-xs font-semibold text-gray-200 pt-1">Facturadas vs Intencion Compra (%)</div>
                 <div id="chart_div_1" class="flex justify-center"></div>
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col hidden md:block">
                 <div class="text-xs font-semibold text-gray-200 pt-1">Facturadas vs Ordenes (%)</div>
                 <div id="chart_div_2" class="flex justify-center"></div>
             </div>
@@ -152,7 +152,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-jet-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                <span class="text-gray-200">{{ __('Dashboard') }}</span>
             </x-jet-responsive-nav-link>
         </div>
 
@@ -166,15 +166,15 @@
                 @endif
 
                 <div>
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                    <div class="font-medium text-base text-gray-200">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-200">{{ Auth::user()->email }}</div>
                 </div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <!-- Account Management -->
                 <x-jet-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
+                    <span class="text-gray-200">{{ __('Profile') }}</span>
                 </x-jet-responsive-nav-link>
 
                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
@@ -190,7 +190,7 @@
                     <x-jet-responsive-nav-link href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
                                     this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        <span class="text-gray-200">{{ __('Log Out') }}</span>
                     </x-jet-responsive-nav-link>
                 </form>
 
