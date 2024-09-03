@@ -30,5 +30,6 @@ class ErpTransaccion extends Model
             'carga_id',
             'empleado_carga',
             'direccion',
+            'plazo',
     ];
 }

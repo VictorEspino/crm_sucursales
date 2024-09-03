@@ -34,7 +34,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     public function model(array $row)
     {
 
-        $resultado_rentabilidad=$this->getRentabilidad($row['tipo'],$row['importe']);
+        $resultado_rentabilidad=$this->getRentabilidad($row['tipo'],$row['importe'],$row['servicio'],intval($row['plazo_en_meses']));
         $udn=0;
         $region='SOCIO COMERCIAL';
         $direccion='SOCIOS';
@@ -62,6 +62,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
             'dn'=>$row['numero_dn'],
             'servicio'=>$row['servicio'],
             'producto'=>$row['producto'],
+            'plazo'=>intval($row['plazo_en_meses']),
             'carga_id'=>$this->carga_id,
             'empleado_carga'=>Auth::user()->empleado,
             'direccion'=>$direccion,
@@ -81,7 +82,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
     {
         return 100;
     }
-    private function getRentabilidad($tipo,$importe)
+    private function getRentabilidad($tipo,$importe,$servicio,$plazo)
     {
         $regreso=array('ingreso'=>0,'costo'=>0,'bracket'=>0,'tipo_estandar'=>'');
         if(
@@ -113,8 +114,8 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
 
 
             $regreso['bracket']=$this->getBracket_transaccion($importe);
-            $regreso['ingreso']=$this->getIngreso_transaccion($tipo,$this->getBracket_transaccion($importe));
-            $regreso['costo']=(1+0.33*30/30.4+0.03)*$this->getCosto_transaccion($tipo,$this->getBracket_transaccion($importe));
+            $regreso['ingreso']=$this->getIngreso_transaccion($tipo,$this->getBracket_transaccion($importe),$servicio,$plazo,$importe);
+            $regreso['costo']=(1+0.33*30/30.4+0.03)*$this->getCosto_transaccion($tipo,$this->getBracket_transaccion_costo($importe),$servicio,$plazo,$importe);
         }
         if($tipo=="ADD ON")
         {
@@ -133,6 +134,24 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         return($regreso);
     }
     private function getBracket_transaccion($importe)
+    {
+        if($importe>=0 && $importe<=298.999999) {return(1);}
+        if($importe>=299 && $importe<=398.999999) {return(2);}
+        if($importe>=399 && $importe<=498.999999) {return(3);}
+        if($importe>=499 && $importe<=598.999999) {return(4);}
+        if($importe>=599 && $importe<=648.999999) {return(5);}
+        if($importe>=649 && $importe<=658.999999) {return(6);}
+        if($importe>=659 && $importe<=748.999999) {return(7);}
+        if($importe>=749 && $importe<=758.999999) {return(8);}
+        if($importe>=759 && $importe<=848.999999) {return(9);}
+        if($importe>=849 && $importe<=948.999999) {return(10);}
+        if($importe>=949 && $importe<=1048.999999) {return(11);}
+        if($importe>=1049 && $importe<=1198.999999) {return(12);}
+        if($importe>=1199 && $importe<=1498.999999) {return(13);}
+        if($importe>=1499 && $importe<=49999.999999) {return(14);}
+        return(0);
+    }
+    private function getBracket_transaccion_costo($importe)
     {
         if($importe>=0 && $importe<=258.999999) {return(1);}
         if($importe>=259 && $importe<=264.999999) {return(2);}
@@ -159,115 +178,58 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($importe>=5505 && $importe<=20000.999999) {return(23);}
         return(0);
     }
-    private function getIngreso_transaccion($tipo,$bracket)
+
+    private function getIngreso_transaccion($tipo,$bracket,$servicio,$plazo,$importe)
     {
+        if(strpos($servicio,"SIMPLE")!==false)
+        {
+            if($plazo==6) return(75);
+            if($plazo>=12 and $plazo<18) return(($importe/1.16/1.03)*1.5);
+            if($plazo>=18 and $plazo<24) return(($importe/1.16/1.03)*2.5);
+            if($plazo>=24) return(($importe/1.16/1.03)*3);
+        }
         if($tipo=="Activación" || $tipo=="Activacion" ||
            $tipo=="Activación Empresarial" || $tipo=="Activacion Empresarial"
-          )
-        {
-            if($bracket==1){return(1400);}
-            if($bracket==2){return(1555);}
-            if($bracket==3){return(1600);}
-            if($bracket==4){return(2200);}
-            if($bracket==5){return(2430);}
-            if($bracket==6){return(2700);}
-            if($bracket==7){return(3065);}
-            if($bracket==8){return(3000);}
-            if($bracket==9){return(3065);}
-            if($bracket==10){return(3500);}
-            if($bracket==11){return(3566);}
-            if($bracket==12){return(4000);}
-            if($bracket==13){return(4019);}
-            if($bracket==14){return(4500);}
-            if($bracket==15){return(4519);}
-            if($bracket==16){return(5280);}
-            if($bracket==17){return(5500);}
-            if($bracket==18){return(7204);}
-            if($bracket==19){return(8000);}
-            if($bracket==20){return(11500);}
-            if($bracket==21){return(14500);}
-            if($bracket==22){return(21000);}
-            if($bracket==23){return(27500);}
+          )       
+          {
+            if($bracket==1){return(458);}
+            if($bracket==2){return(1718);}
+            if($bracket==3){return(2587);}
+            if($bracket==4){return(2995);}
+            if($bracket==5){return(3530);}
+            if($bracket==6){return(3533);}
+            if($bracket==7){return(3580);}
+            if($bracket==8){return(4038);}
+            if($bracket==9 || strpos($servicio,"TITANIO")!== false){return(4085);}
+            if($bracket==10){return(4489);}
+            if($bracket==11){return(4993);}
+            if($bracket==12){return(5758);}
+            if($bracket==13){return(6245);}
+            if($bracket==14){return(7683);}
         }
         if($tipo=="Renovación" || $tipo=="Renovacion"||
-           $tipo=="Renovación Empresarial" || $tipo=="Renovacion Empresarial"
+           $tipo=="Renovación Empresarial" || $tipo=="Renovacion Empresarial"||
+           $tipo=="Activación Equipo Propio" || $tipo=="Activacion Equipo Propio"
           )
         {
-            if($bracket==1){return(900);}
-            if($bracket==2){return(1055);}
-            if($bracket==3){return(1100);}
-            if($bracket==4){return(1700);}
-            if($bracket==5){return(1930);}
-            if($bracket==6){return(2200);}
-            if($bracket==7){return(2565);}
-            if($bracket==8){return(2500);}
-            if($bracket==9){return(2565);}
-            if($bracket==10){return(3000);}
-            if($bracket==11){return(3066);}
-            if($bracket==12){return(3500);}
-            if($bracket==13){return(3519);}
-            if($bracket==14){return(4000);}
-            if($bracket==15){return(4019);}
-            if($bracket==16){return(4780);}
-            if($bracket==17){return(5000);}
-            if($bracket==18){return(6704);}
-            if($bracket==19){return(7500);}
-            if($bracket==20){return(11000);}
-            if($bracket==21){return(14000);}
-            if($bracket==22){return(20500);}
-            if($bracket==23){return(27000);}
-        }
-        if($tipo=="Activación Equipo Propio" || $tipo=="Activacion Equipo Propio")
-        {
-            if($bracket==1){return(900);}
-            if($bracket==2){return(1055);}
-            if($bracket==3){return(1100);}
-            if($bracket==4){return(1700);}
-            if($bracket==5){return(1930);}
-            if($bracket==6){return(2200);}
-            if($bracket==7){return(2565);}
-            if($bracket==8){return(2500);}
-            if($bracket==9){return(2565);}
-            if($bracket==10){return(3000);}
-            if($bracket==11){return(3066);}
-            if($bracket==12){return(3500);}
-            if($bracket==13){return(3519);}
-            if($bracket==14){return(4000);}
-            if($bracket==15){return(4019);}
-            if($bracket==16){return(4780);}
-            if($bracket==17){return(5000);}
-            if($bracket==18){return(6704);}
-            if($bracket==19){return(7500);}
-            if($bracket==20){return(11000);}
-            if($bracket==21){return(14000);}
-            if($bracket==22){return(20500);}
-            if($bracket==23){return(27000);}
+            if($bracket==1){return(0);}
+            if($bracket==2){return(1218);}
+            if($bracket==3){return(2087);}
+            if($bracket==4){return(2495);}
+            if($bracket==5){return(3030);}
+            if($bracket==6){return(3033);}
+            if($bracket==7){return(3080);}
+            if($bracket==8){return(3538);}
+            if($bracket==9 || strpos($servicio,"TITANIO")!== false){return(3585);}
+            if($bracket==10){return(3989);}
+            if($bracket==11){return(4493);}
+            if($bracket==12){return(5258);}
+            if($bracket==13){return(5745);}
+            if($bracket==14){return(7183);}
         }
         if($tipo=="Renovación Equipo Propio" || $tipo=="Renovacion Equipo Propio")
         {
-            if($bracket==1){return(450);}
-            if($bracket==2){return(528);}
-            if($bracket==3){return(550);}
-            if($bracket==4){return(850);}
-            if($bracket==5){return(965);}
-            if($bracket==6){return(1100);}
-            if($bracket==7){return(1283);}
-            if($bracket==8){return(1250);}
-            if($bracket==9){return(1283);}
-            if($bracket==10){return(1500);}
-            if($bracket==11){return(1533);}
-            if($bracket==12){return(1750);}
-            if($bracket==13){return(1760);}
-            if($bracket==14){return(2000);}
-            if($bracket==15){return(2010);}
-            if($bracket==16){return(2390);}
-            if($bracket==17){return(2500);}
-            if($bracket==18){return(3352);}
-            if($bracket==19){return(3750);}
-            if($bracket==20){return(5500);}
-            if($bracket==21){return(7000);}
-            if($bracket==22){return(10250);}
-            if($bracket==23){return(13500);}
+            return(0);
         }
         return(0);
     }
@@ -306,8 +268,15 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         if($bracket==6){return(618.10);}
         return(0);
     }
-    private function getCosto_transaccion($tipo,$bracket)
+    private function getCosto_transaccion($tipo,$bracket,$servicio,$plazo,$importe)
     {
+        if(strpos($servicio,"SIMPLE")!==false)
+        {
+            if($plazo==6) return(38);
+            if($plazo>=12 and $plazo<18) return(($importe/1.16/1.03)*0.8);
+            if($plazo>=18 and $plazo<24) return(($importe/1.16/1.03)*1.3);
+            if($plazo>=24) return(($importe/1.16/1.03)*1.6);
+        }
         if($tipo=="Activación" || $tipo=="Activacion" ||
            $tipo=="Activación Empresarial" || $tipo=="Activacion Empresarial"
           )
@@ -392,29 +361,7 @@ class ErpTransaccionesImport implements ToModel,WithHeadingRow,WithValidation,Wi
         }
         if($tipo=="Renovación Equipo Propio" || $tipo=="Renovacion Equipo Propio")
         {
-            if($bracket==1){return(93);}
-            if($bracket==2){return(108.5);}
-            if($bracket==3){return(109);}
-            if($bracket==4){return(179);}
-            if($bracket==5){return(203);}
-            if($bracket==6){return(240.5);}
-            if($bracket==7){return(279.5);}
-            if($bracket==8){return(275.23275862069);}
-            if($bracket==9){return(282.5);}
-            if($bracket==10){return(329.879310344828);}
-            if($bracket==11){return(338);}
-            if($bracket==12){return(385.525862068965);}
-            if($bracket==13){return(388);}
-            if($bracket==14){return(440.172413793103);}
-            if($bracket==15){return(443.5);}
-            if($bracket==16){return(527.5);}
-            if($bracket==17){return(550.465517241379);}
-            if($bracket==18){return(739);}
-            if($bracket==19){return(824.698275862069);}
-            if($bracket==20){return(941);}
-            if($bracket==21){return(1202);}
-            if($bracket==22){return(1764);}
-            if($bracket==23){return(2326);}
+            return(0);
         }
         return(0);
     }

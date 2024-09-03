@@ -60,7 +60,7 @@
                     <select class="w-full rounded p-1 border border-gray-300" type="text" name="sucursal">
                         <option value="" class=""></option>                        
                     <?php  
-                        $sucursales=App\Models\Sucursal::orderBy('pdv','asc')->get();
+                        $sucursales=App\Models\Sucursal::where('estatus','Activo')->orderBy('pdv','asc')->get();
                         foreach ($sucursales as $sucursal) {
                     ?>
                         <option value="{{$sucursal->udn}}" class="" {{old('sucursal')==$sucursal->udn?'selected':''}}>{{$sucursal->pdv}}</option>

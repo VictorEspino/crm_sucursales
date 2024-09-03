@@ -61,6 +61,8 @@ class ProcesaSeguimientoController extends Controller
     {
         $campo_universo='';
         $key_universo='';
+
+        $filtro_opcion=[];
     
         if(Auth::user()->puesto=='Ejecutivo' || Auth::user()->puesto=='Otro')
         {
@@ -78,19 +80,34 @@ class ProcesaSeguimientoController extends Controller
             $key_universo=Auth::user()->pdv;
         }
 
+        $filtro_opcion=Sucursal::where($campo_universo,$key_universo)
+                                ->where('estatus','Activo')
+                                ->orderBy('pdv','asc')
+                                ->get();
+
+        $sucursal=0;
+
+        if(isset($_GET['query']))
+        {
+            $sucursal=$_GET["query"];
+        }
+
         $registros=Funnel::where($campo_universo,$key_universo)
                             ->select('id',DB::raw('cliente as title, fecha_sig_contacto as start,CASE WHEN fecha_sig_contacto<date(now()) THEN "#FF0000" ELSE "#0073e6" END as backgroundColor'))
                             ->where('estatus','!=','Orden')
                             ->where('estatus','!=','Finalizar Seguimiento')
+                            ->when($sucursal != 0, function ($query) use ($sucursal) {
+                                return $query->where('udn', $sucursal);
+                            })
                             ->orderBy('created_at','desc')
                             ->get();                      
-                            //return($registros);         
+
         $SQL_inicio="select lpad(now(),10,0) as hoy from dual";
         $inicio=DB::select(DB::raw(
             $SQL_inicio
         ));
 
-        return(view('seguimiento_funnel_calendario',['registros'=>$registros,'inicio'=>$inicio[0]->hoy]));
+        return(view('seguimiento_funnel_calendario',['registros'=>$registros,'inicio'=>$inicio[0]->hoy,'filtro_opcion'=>$filtro_opcion,'filtro'=>$sucursal]));
     }
     public function seguimiento_orden(Request $request)
     {

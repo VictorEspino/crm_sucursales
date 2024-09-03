@@ -83,7 +83,14 @@ class ProcesaFormasController extends Controller
                   'noe'=>$request->boolean('noe'),
                   'asd'=>$request->boolean('asd'),
                 ]);
-
+                
+                if($request->estatus=='Inactivo')
+                {
+                        
+                    User::where('empleado', $request->empleado)
+                        ->update(['password'=>'INACTIVO_'.Auth::user()->id]);
+                }
+        
         return(view('mensaje',[ 'estatus'=>'OK',
                                 'mensaje'=>'La actualizacion del empleado ('.$request->empleado.' - '.$request->nombre.') se realizo de manera exitosa!'
                               ]));

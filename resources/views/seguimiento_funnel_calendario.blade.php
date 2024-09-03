@@ -9,7 +9,22 @@
             <div class="w-full text-sm">({{Auth::user()->udn}}) - {{Auth::user()->pdv}}</div>
             <div class="w-full text-sm">({{Auth::user()->empleado}}) - {{Auth::user()->name}}</div>            
         </div> <!--FIN ENCABEZADO-->
-        
+        <form action="{{route('seguimiento_funnel_calendario')}}" class="">
+        <div class="w-full p-3 flex flex-row"> <!--FILTRO-->
+            <div class="w-1/4 text-base font-semibold">Filtro Sucursal</div>
+            <div class="w-1/2 text-sm">
+                <select class="w-full rounded p-1 border border-gray-300" type="text" name="query" id="query">
+                    <option value="0" class="">Todas</option>       
+                    @foreach($filtro_opcion as $opcion)
+                    <option value="{{$opcion->udn}}" class="" {{$filtro==$opcion->udn?'selected':''}}>{{$opcion->pdv}}</option> 
+                    @endforeach                 
+                </select>
+            </div>
+            <div class="w-1/4 px-6">
+                <button class="rounded p-1 border bg-green-500 hover:bg-green-700 text-gray-100 font-semibold">Buscar</button>
+            </div>
+        </div><!--FIN FILTRO-->
+        </form>
         <div class="w-full rounded-b-lg bg-white p-3 flex flex-col"> <!--CONTENIDO-->
             <div class="w-full">
                 <div id='calendar'></div>
